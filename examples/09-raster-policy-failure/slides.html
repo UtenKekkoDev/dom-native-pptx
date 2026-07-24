@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><link rel="stylesheet" href="../shared.css"><style>
+.bad{position:absolute;left:240px;top:330px;width:1440px;height:430px;padding:80px;background:linear-gradient(135deg,#6d35a8,#e95b8f)}
+.bad p{margin:0;color:white;font-size:54px;font-weight:800}
+</style></head><body><section class="pptx-slide">
+  <h1 class="title" data-pptx-text-role="title">该示例必须失败</h1>
+  <div id="bad-raster" class="bad" data-pptx-raster="allowed" data-pptx-raster-role="photo">
+    <p data-pptx-text-role="body">正文即使位于允许的图片容器内，也绝对不能被栅格化。</p>
+  </div>
+</section></body></html>

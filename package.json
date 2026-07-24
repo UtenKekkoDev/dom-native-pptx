@@ -1,0 +1,90 @@
+{
+  "name": "dom-native-pptx",
+  "version": "0.2.0-beta.1",
+  "description": "Fail-closed HTML DOM to native editable PowerPoint converter and Agent Skill.",
+  "private": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "dom-native-pptx": "./dist/cli.js"
+  },
+  "files": [
+    "dist/**",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md",
+    "ARCHITECTURE.md",
+    "RASTER_POLICY.md",
+    "SUPPORTED_CSS.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UtenKekkoDev/dom-native-pptx.git"
+  },
+  "bugs": {
+    "url": "https://github.com/UtenKekkoDev/dom-native-pptx/issues"
+  },
+  "homepage": "https://github.com/UtenKekkoDev/dom-native-pptx#readme",
+  "keywords": [
+    "powerpoint",
+    "pptx",
+    "html-to-pptx",
+    "editable-slides",
+    "agent-skill"
+  ],
+  "author": "Yuxuan Sun",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "prebuild": "node scripts/clean-dist.mjs",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:package": "npm run build && node scripts/verify-package.mjs",
+    "audit:licenses": "node scripts/audit-licenses.mjs",
+    "test:stress": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-stress-suite.ps1",
+    "pptx:export": "tsx src/cli.ts export",
+    "pptx:validate": "tsx src/cli.ts validate",
+    "pptx:inspect": "tsx src/cli.ts inspect",
+    "pptx:render-html": "tsx src/cli.ts render-html",
+    "pptx:render-powerpoint": "powershell -NoProfile -ExecutionPolicy Bypass -File src/validate/powerpoint-validator.ps1",
+    "pptx:compare": "tsx src/cli.ts compare"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/pixelmatch": "^5.2.6",
+    "@types/pngjs": "^6.0.5",
+    "eslint": "^10.7.0",
+    "prettier": "^3.9.5",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  },
+  "dependencies": {
+    "commander": "^15.0.0",
+    "dom-to-pptx": "^2.0.3",
+    "fast-xml-parser": "^5.10.1",
+    "fontkit": "^2.0.4",
+    "jszip": "^3.10.1",
+    "pixelmatch": "^7.2.0",
+    "playwright": "^1.61.1",
+    "pngjs": "^7.0.0",
+    "pptxgenjs": "^4.0.1",
+    "sharp": "^0.35.3",
+    "zod": "^4.4.3"
+  }
+}

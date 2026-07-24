@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <style>
+    html, body { margin: 0; }
+    .pptx-slide { position: relative; width: 1920px; height: 1080px; }
+    #bad { position: absolute; inset: 100px; }
+  </style>
+</head>
+<body>
+  <section class="pptx-slide">
+    <div
+      id="bad"
+      data-pptx-raster="allowed"
+      data-pptx-raster-role="photo"
+    >
+      <p data-pptx-text-role="body">这段正文绝对不能转换成图片。</p>
+    </div>
+  </section>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Adversarial conversion policy fixtures</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;font-family:"Microsoft YaHei","Segoe UI",sans-serif}
+.pptx-slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:#f5f1eb}
+.title{position:absolute;left:120px;top:100px;width:1500px;height:100px;font-size:60px;line-height:1.2}
+.target{position:absolute;left:240px;top:330px;width:1100px;height:400px;background:#6d3ed2}
+#pseudo-copy::before{content:"This generated sentence would disappear from native PowerPoint";display:block;padding:80px;color:white;font-size:42px}
+#decorative-pseudo::before{content:"";position:absolute;inset:50px;border:10px solid #f1c44c;border-radius:50%}
+canvas{position:absolute;left:300px;top:340px;width:900px;height:420px;background:#231833}
+#unmarked-gradient{background:linear-gradient(135deg,#6535d8,#f05b74);filter:drop-shadow(0 30px 34px rgba(59,26,92,.34))}
+#negative-layer{z-index:-1}
+</style>
+</head>
+<body>
+<section class="pptx-slide" id="pseudo-text">
+  <h1 class="title" data-pptx-text-role="title">Pseudo-element text must fail closed</h1>
+  <div class="target" id="pseudo-copy"></div>
+</section>
+<section class="pptx-slide" id="canvas-unmarked">
+  <h1 class="title" data-pptx-text-role="title">Unmarked canvas must not disappear</h1>
+  <canvas id="canvas-visual" width="900" height="420"></canvas>
+</section>
+<section class="pptx-slide" id="protected-raster">
+  <h1 class="title" data-pptx-text-role="title">Protected text cannot enter raster</h1>
+  <div class="target" id="bad-raster" data-pptx-raster="allowed" data-pptx-raster-role="photo">
+    <p data-pptx-text-role="body">This semantic sentence must remain editable.</p>
+  </div>
+</section>
+<section class="pptx-slide" id="decorative-pseudo">
+  <h1 class="title" data-pptx-text-role="title">Empty decorative pseudo-element is allowed</h1>
+  <div class="target" id="decorative-pseudo"></div>
+</section>
+<section class="pptx-slide" id="unmarked-gradient">
+  <h1 class="title" data-pptx-text-role="title">Unsupported visuals must fail closed</h1>
+  <div class="target" id="unmarked-gradient"></div>
+</section>
+<section class="pptx-slide" id="negative-z-index">
+  <h1 class="title" data-pptx-text-role="title">Negative z-index must not change meaning</h1>
+  <div class="target" id="negative-layer"></div>
+</section>
+</body>
+</html>

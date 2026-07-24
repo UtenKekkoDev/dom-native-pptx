@@ -1,0 +1,4 @@
+interface:
+  display_name: "DOM Native PPTX"
+  short_description: "Create source-faithful editable PowerPoint"
+  default_prompt: "Use $dom-native-pptx to convert slide-safe HTML or a visual slide reference into a source-faithful editable PowerPoint and complete structural, typography, raster, and PowerPoint-render QA."
