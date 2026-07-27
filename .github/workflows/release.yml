@@ -1,0 +1,120 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PUPPETEER_SKIP_DOWNLOAD: "true"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: "@utenkekkodev"
+      - run: npm ci
+      - run: npx --no-install playwright install --with-deps chromium
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npm run audit:licenses
+      - run: npm run build
+      - run: npm run test:run
+      - run: npm run test:package
+
+      - name: Verify release metadata
+        id: release
+        shell: bash
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if [[ "${GITHUB_REF_NAME}" != "v${VERSION}" ]]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package version ${VERSION}." >&2
+            exit 1
+          fi
+
+          if [[ "${VERSION}" == *-* ]]; then
+            DIST_TAG="$(node -p "require('./package.json').version.split('-')[1].split('.')[0]")"
+            PRERELEASE="true"
+          else
+            DIST_TAG="latest"
+            PRERELEASE="false"
+          fi
+
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "dist_tag=${DIST_TAG}" >> "${GITHUB_OUTPUT}"
+          echo "prerelease=${PRERELEASE}" >> "${GITHUB_OUTPUT}"
+
+      - name: Prepare GitHub package metadata
+        shell: bash
+        run: |
+          npm pkg set name="@utenkekkodev/dom-native-pptx"
+          npm pkg set publishConfig.registry="https://npm.pkg.github.com"
+          npm pkg delete publishConfig.provenance
+
+      - name: Pack release asset
+        id: pack
+        shell: bash
+        run: |
+          mkdir -p release-assets
+          PACKAGE_FILE="$(npm pack --ignore-scripts --silent)"
+          mv "${PACKAGE_FILE}" release-assets/
+          (
+            cd release-assets
+            sha256sum "${PACKAGE_FILE}" > SHA256SUMS.txt
+          )
+          echo "package_file=${PACKAGE_FILE}" >> "${GITHUB_OUTPUT}"
+
+      - name: Publish GitHub Package
+        shell: bash
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PACKAGE_NAME="@utenkekkodev/dom-native-pptx"
+          PACKAGE_VERSION="${{ steps.release.outputs.version }}"
+
+          if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version --registry=https://npm.pkg.github.com --silent >/dev/null 2>&1; then
+            echo "${PACKAGE_NAME}@${PACKAGE_VERSION} is already published; skipping."
+          else
+            npm publish --ignore-scripts --access public --tag "${{ steps.release.outputs.dist_tag }}"
+          fi
+
+      - name: Create or update GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          TITLE="DOM Native PPTX ${{ steps.release.outputs.version }}"
+          ASSETS=(
+            "release-assets/${{ steps.pack.outputs.package_file }}"
+            "release-assets/SHA256SUMS.txt"
+          )
+
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            gh release upload "${TAG}" "${ASSETS[@]}" --clobber
+          else
+            FLAGS=()
+            if [[ "${{ steps.release.outputs.prerelease }}" == "true" ]]; then
+              FLAGS+=(--prerelease)
+            fi
+            gh release create "${TAG}" "${ASSETS[@]}" \
+              --verify-tag \
+              --title "${TITLE}" \
+              --generate-notes \
+              "${FLAGS[@]}"
+          fi

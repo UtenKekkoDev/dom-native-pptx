@@ -1,22 +1,24 @@
 # Open-source readiness
 
-Audit date: 2026-07-23. This document records the approved publication policy
-and the remaining release gates. It does not mean the repository or npm
-package has already been published.
+Audit date: 2026-07-27. This document records the approved publication policy,
+the live GitHub release channels, and the remaining npmjs release gates.
 
 ## Approved release decisions
 
 - License: MIT, copyright `Yuxuan Sun`, 2026.
-- Planned repository: `https://github.com/UtenKekkoDev/dom-native-pptx`.
-- Planned npm package: unscoped `dom-native-pptx`.
-- First public tag: `0.2.0-beta.1`; stable target: `0.2.0`.
+- Public repository: `https://github.com/UtenKekkoDev/dom-native-pptx`.
+- GitHub Package: `@utenkekkodev/dom-native-pptx`.
+- Reserved npmjs package: unscoped `dom-native-pptx`.
+- First public tag: `v0.2.0-beta.1`; stable target: `v0.2.0`.
 - Node.js policy: Node.js 22 or newer.
 - Full support: Windows 10/11 plus Microsoft PowerPoint Desktop.
 - Experimental support: portable Node/Chromium conversion and OOXML checks on
   macOS and Linux. These platforms cannot provide the authoritative PowerPoint
   Desktop render gate.
-- npm provenance is enabled in `publishConfig`; the eventual release workflow
-  must use trusted publishing or an OIDC-capable GitHub Actions job.
+- GitHub Packages and Releases are published from version tags by GitHub
+  Actions with the repository-scoped `GITHUB_TOKEN`.
+- npm provenance remains enabled in `publishConfig` for a future npmjs release,
+  which must use trusted publishing or an OIDC-capable GitHub Actions job.
 
 ## Current verified state
 
@@ -65,18 +67,29 @@ historical plans containing personal absolute paths.
 - Re-run the secret scan against the exact snapshot and verify the repository
   is public with `main` as its default branch after pushing.
 
-## Remaining npm publication gates
+## GitHub package and release automation
+
+- A `v*` tag starts a clean Linux build, production dependency audit,
+  dependency license audit, portable tests, and package allowlist check.
+- The tag must exactly match the version in `package.json`.
+- GitHub Packages receives the required scoped name while the source package
+  retains the reserved unscoped npmjs name.
+- GitHub Releases receives the same scoped npm tarball and `SHA256SUMS.txt`.
+- Beta versions publish with the `beta` dist-tag and as GitHub prereleases.
+
+## Remaining npmjs publication gates
 
 - Confirm the npm name is still available immediately before publication.
 - Configure npm trusted publishing/OIDC for the GitHub repository.
-- Publish `0.2.0-beta.1` with the `beta` dist-tag before any stable release.
+- Publish `0.2.0-beta.1` to npmjs with the `beta` dist-tag before any stable
+  npmjs release.
 - Install the resulting tarball in a clean consumer project and test both the
   CLI and public library API.
 
 ## P1 engineering work
 
-- Add an OIDC npm release workflow after the repository exists and branch
-  protection is configured.
+- Add an npmjs trusted-publishing workflow after the package name and publisher
+  settings are confirmed.
 - Split portable tests from PowerPoint COM tests with stable tags and publish
   both result summaries.
 - Add Dependabot or Renovate and document the lockfile update policy.
@@ -99,8 +112,8 @@ historical plans containing personal absolute paths.
 
 ## Release gates
 
-The GitHub source release and npm package publication are separate gates. A
-sanitized source snapshot may be published once its exact tree passes the
-secret, path, build, test, and package checks. npm publication waits for the
-npm-specific gates above. The Windows PowerPoint render remains mandatory for
-both release decisions even when all portable CI lanes pass.
+GitHub Packages/Releases and npmjs publication are separate gates. A version
+tag may publish to GitHub after its exact tree passes the secret, path, build,
+test, and package checks. npmjs publication waits for the npmjs-specific gates
+above. The Windows PowerPoint render remains mandatory for stable release
+decisions even when all portable CI lanes pass.

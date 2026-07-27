@@ -5,16 +5,17 @@ objects. It is fail-closed by design: titles, body copy, numbers, tables,
 chart labels, sources, footnotes, and page numbers may never silently become
 SVG, PNG, or a full-slide screenshot.
 
-> Public repository and npm publication are planned but are not live yet. The
-> current release candidate is `0.2.0-beta.1`.
+> Public beta `0.2.0-beta.1` is distributed through
+> [GitHub Packages](https://github.com/users/UtenKekkoDev/packages?repo_name=dom-native-pptx)
+> and [GitHub Releases](https://github.com/UtenKekkoDev/dom-native-pptx/releases).
 
 ## Platform support
 
-| Capability | Windows 10/11 | macOS | Linux |
-|---|---:|---:|---:|
-| Node/Chromium DOM conversion | Supported | Experimental | Experimental |
-| OOXML structural validation | Supported | Experimental | Experimental |
-| Authoritative Microsoft PowerPoint render QA | Supported | Not available | Not available |
+| Capability                                   | Windows 10/11 |         macOS |         Linux |
+| -------------------------------------------- | ------------: | ------------: | ------------: |
+| Node/Chromium DOM conversion                 |     Supported |  Experimental |  Experimental |
+| OOXML structural validation                  |     Supported |  Experimental |  Experimental |
+| Authoritative Microsoft PowerPoint render QA |     Supported | Not available | Not available |
 
 The supported reference environment is Node.js 22+, Windows 10/11, and
 Microsoft PowerPoint Desktop. Fonts used by the source HTML must be installed
@@ -31,11 +32,20 @@ npm run build
 npm run test:run
 ```
 
-After the public beta is published, the intended npm install command is:
+## Install the public beta
+
+GitHub Packages requires npm authentication, including for public packages.
+Log in with your GitHub username and a classic personal access token with the
+`read:packages` scope, then install the scoped package:
 
 ```sh
-npm install dom-native-pptx@beta
+npm login --scope=@utenkekkodev --auth-type=legacy --registry=https://npm.pkg.github.com
+npm install @utenkekkodev/dom-native-pptx@beta
 ```
+
+The unscoped `dom-native-pptx` name is reserved for a future npmjs release and
+is not published there yet. Each GitHub Release also includes an installable
+scoped package tarball and `SHA256SUMS.txt`.
 
 ## HTML contract
 
@@ -65,29 +75,26 @@ accepts the output path as the final positional argument.
 ## Library API
 
 ```ts
-import { exportDeck, inspectPptx } from "dom-native-pptx";
+import { exportDeck, inspectPptx } from "@utenkekkodev/dom-native-pptx";
 
 const result = await exportDeck({
   input: "slides.html",
   output: "slides.pptx",
 });
 
-const validation = await inspectPptx(
-  result.output,
-  result.manifestPath,
-);
+const validation = await inspectPptx(result.output, result.manifestPath);
 ```
 
 ## Output objects
 
-| HTML source | PPTX output | Editable |
-|---|---|---:|
-| Heading, paragraph, or number | Native text box | Yes |
-| Solid background or border | Native shape | Yes |
-| Semantic `<table>` | Native PowerPoint table | Yes |
-| `data-pptx-chart-config` | Native PowerPoint chart | Yes |
-| Authorized photo, illustration, or logo | Image | No |
-| Full slide or protected text capture | Rejected | N/A |
+| HTML source                             | PPTX output             | Editable |
+| --------------------------------------- | ----------------------- | -------: |
+| Heading, paragraph, or number           | Native text box         |      Yes |
+| Solid background or border              | Native shape            |      Yes |
+| Semantic `<table>`                      | Native PowerPoint table |      Yes |
+| `data-pptx-chart-config`                | Native PowerPoint chart |      Yes |
+| Authorized photo, illustration, or logo | Image                   |       No |
+| Full slide or protected text capture    | Rejected                |      N/A |
 
 ## Raster policy
 
