@@ -20,6 +20,8 @@ describe("open-source readiness guardrails", () => {
     expect(workflow).toContain("playwright install chromium");
     expect(workflow).toContain("npm run build");
     expect(workflow).toMatch(/npm (run test:run|test -- --run)/);
+    expect(workflow).toContain("actions/checkout@v6");
+    expect(workflow).toContain("actions/setup-node@v6");
   });
 
   it("does not require the maintainer's absolute Windows path", () => {
@@ -59,6 +61,8 @@ describe("open-source readiness guardrails", () => {
     expect(workflow).toContain("NODE_AUTH_TOKEN");
     expect(workflow).toContain("SHA256SUMS.txt");
     expect(workflow).toContain("gh release create");
+    expect(workflow).toContain("actions/checkout@v6");
+    expect(workflow).toContain("actions/setup-node@v6");
 
     const prepareIndex = workflow.indexOf(
       "name: Prepare GitHub package metadata",
