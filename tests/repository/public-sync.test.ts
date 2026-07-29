@@ -870,8 +870,18 @@ describe("committed public tree synchronization", () => {
       await fs.stat(path.join(publicRepo, "src", "index.ts"))
     ).mode;
 
-    await expect(
-      materializePublicTree({
+    let caught:
+      | (Error & {
+          code?: string;
+          rollbackError?: Error & {
+            code?: string;
+            path?: string;
+            cause?: unknown;
+          };
+        })
+      | undefined;
+    try {
+      await materializePublicTree({
         sourceRepo: privateRepo,
         sourceRef: "HEAD",
         destination: publicRepo,
@@ -880,8 +890,19 @@ describe("committed public tree synchronization", () => {
             throw new Error("injected mid-apply failure");
           }
         },
+      });
+    } catch (error) {
+      caught = error as typeof caught;
+    }
+    expect(
+      caught?.code,
+      JSON.stringify({
+        rollbackCode: caught?.rollbackError?.code,
+        rollbackMessage: caught?.rollbackError?.message,
+        rollbackPath: caught?.rollbackError?.path,
+        rollbackCause: String(caught?.rollbackError?.cause ?? ""),
       }),
-    ).rejects.toMatchObject({ code: "APPLY_FAILED" });
+    ).toBe("APPLY_FAILED");
 
     expect(await fs.readFile(path.join(publicRepo, "README.md"))).toEqual(
       beforeReadme,
@@ -1444,9 +1465,28 @@ describe("committed public tree synchronization", () => {
       },
     });
 
-    expect(await git(publicRepo, "diff", "--cached", "--name-only")).toBe(
-      "README.md",
+    const stagedNames = await git(
+      publicRepo,
+      "diff",
+      "--cached",
+      "--name-only",
     );
+    const autoCrlf = await git(
+      publicRepo,
+      "config",
+      "--get",
+      "core.autocrlf",
+    ).catch(() => "unset");
+    expect(
+      stagedNames,
+      JSON.stringify({
+        autoCrlf,
+        status: await git(publicRepo, "status", "--porcelain=v1"),
+        head: await git(publicRepo, "show", "HEAD:README.md"),
+        index: await git(publicRepo, "show", ":README.md"),
+        worktree: await read(publicRepo, "README.md"),
+      }),
+    ).toBe("README.md");
     expect(await git(publicRepo, "ls-files", "LOCAL_NOTES.txt")).toBe("");
     expect(await read(publicRepo, "LOCAL_NOTES.txt")).toBe(
       "concurrent local note\n",
