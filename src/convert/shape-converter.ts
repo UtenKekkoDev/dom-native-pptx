@@ -26,11 +26,9 @@ export function addNativeShape(
   const radiusValue = Number.parseFloat(borderRadius);
   const isCircle =
     Math.abs(node.rect.width - node.rect.height) <= 1 &&
-    (
-      (borderRadius.endsWith("%") && radiusValue >= 50) ||
+    ((borderRadius.endsWith("%") && radiusValue >= 50) ||
       (borderRadius.endsWith("px") &&
-        radiusValue >= Math.min(node.rect.width, node.rect.height) / 2)
-    );
+        radiusValue >= Math.min(node.rect.width, node.rect.height) / 2));
 
   slide.addShape(isCircle ? "ellipse" : "rect", {
     x: rect.x,

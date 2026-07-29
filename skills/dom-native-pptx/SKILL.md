@@ -28,6 +28,22 @@ Read [references/html-authoring-contract.md](references/html-authoring-contract.
 For PDF, screenshot, template, or reference-deck reproduction, also read [references/source-fidelity.md](references/source-fidelity.md).
 For gradients, `clip-path`, filters, masks, blend modes, transforms, asymmetric borders, or explicit stacking, read [references/complex-effects.md](references/complex-effects.md).
 
+## Security routing
+
+- Safe mode is the default: use `securityMode: "safe"`. It disables page
+  JavaScript and rejects remote resources and local files outside the input
+  HTML directory.
+- Vendor remote assets beside the input HTML and keep their relative paths so
+  safe mode can convert the deck.
+- Use `securityMode: "trusted"` (or the CLI `--trusted` flag) only for
+  trusted HTML you authored or audited that truly needs JavaScript or remote
+  resources. Trusted mode is never safe for untrusted HTML.
+- On a security failure, stop and report the structured error plus its
+  suggested repair; never silently skip the blocked asset, downgrade the
+  policy, or return a successful conversion.
+- Security mode does not weaken the native-text or raster policy. Semantic
+  text remains native, and raster capture still needs explicit authorization.
+
 ## Workflow
 
 1. Locate the converter. Use `DOM_NATIVE_PPTX_HOME` when set; otherwise discover the repository from the current workspace or the Skill installation.

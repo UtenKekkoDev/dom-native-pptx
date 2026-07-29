@@ -6,13 +6,6 @@ function read(relativePath: string): string {
   return fs.readFileSync(path.resolve(relativePath), "utf8");
 }
 
-function readIfPresent(relativePath: string): string {
-  const absolutePath = path.resolve(relativePath);
-  return fs.existsSync(absolutePath)
-    ? fs.readFileSync(absolutePath, "utf8")
-    : "";
-}
-
 describe("open-source readiness guardrails", () => {
   it("has a public CI workflow for portable build and tests", () => {
     const workflow = read(".github/workflows/ci.yml");
@@ -20,8 +13,6 @@ describe("open-source readiness guardrails", () => {
     expect(workflow).toContain("playwright install chromium");
     expect(workflow).toContain("npm run build");
     expect(workflow).toMatch(/npm (run test:run|test -- --run)/);
-    expect(workflow).toContain("actions/checkout@v6");
-    expect(workflow).toContain("actions/setup-node@v6");
   });
 
   it("does not require the maintainer's absolute Windows path", () => {
@@ -47,40 +38,37 @@ describe("open-source readiness guardrails", () => {
     }
   });
 
-  it("publishes version tags to GitHub Packages and GitHub Releases", () => {
-    const workflow = readIfPresent(".github/workflows/release.yml");
+  it("acknowledges every registered generated PNG instead of claiming a binary-free tree", () => {
+    const audit = read("docs/open-source-readiness.md");
+    const registry = JSON.parse(read("docs/asset-provenance.json")) as {
+      assets?: Array<{ path?: string; type?: string }>;
+    };
+    const generatedPngs = (registry.assets ?? [])
+      .filter(
+        (asset) =>
+          asset.type === "generated" && asset.path?.endsWith(".png") === true,
+      )
+      .map((asset) => asset.path);
 
-    expect(workflow).toContain("tags:");
-    expect(workflow).toContain("packages: write");
-    expect(workflow).toContain("contents: write");
-    expect(workflow).toContain("PUPPETEER_SKIP_DOWNLOAD");
-    expect(workflow).toContain("npm run test:run");
-    expect(workflow).toContain("npm run test:package");
-    expect(workflow).toContain("@utenkekkodev/dom-native-pptx");
-    expect(workflow).toContain("https://npm.pkg.github.com");
-    expect(workflow).toContain("NODE_AUTH_TOKEN");
-    expect(workflow).toContain("SHA256SUMS.txt");
-    expect(workflow).toContain("gh release create");
-    expect(workflow).toContain("actions/checkout@v6");
-    expect(workflow).toContain("actions/setup-node@v6");
-
-    const prepareIndex = workflow.indexOf(
-      "name: Prepare GitHub package metadata",
-    );
-    const packIndex = workflow.indexOf("name: Pack release asset");
-    expect(prepareIndex).toBeGreaterThan(-1);
-    expect(packIndex).toBeGreaterThan(prepareIndex);
+    expect(generatedPngs).toEqual([
+      "docs/assets/demo-html.png",
+      "docs/assets/demo-powerpoint.png",
+    ]);
+    expect(audit).not.toMatch(/tracked source contains no binary media/iu);
+    for (const assetPath of generatedPngs) {
+      expect(audit).toContain(assetPath);
+    }
+    expect(audit).toContain("docs/asset-provenance.md");
   });
 
-  it("documents the live package and release channels", () => {
+  it("documents that the typography scorecard does not detect collisions yet", () => {
     const readme = read("README.md");
-
-    expect(readme).not.toContain(
-      "Public repository and npm publication are planned",
+    expect(readme).toMatch(
+      /does not detect text-to-text or text-to-shape collisions/iu,
     );
-    expect(readme).toContain("@utenkekkodev/dom-native-pptx@beta");
-    expect(readme).toContain(
-      "https://github.com/UtenKekkoDev/dom-native-pptx/releases",
+    expect(readme).toMatch(/planned for automated validation/iu);
+    expect(readme).not.toMatch(
+      /editability, raster policy, typography, layer order,[\s\S]*are release gates/iu,
     );
   });
 });

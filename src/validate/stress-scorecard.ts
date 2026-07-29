@@ -4,10 +4,7 @@ import { fileURLToPath } from "node:url";
 
 export type GateStatus = "pass" | "fail" | "unavailable";
 export type StressStatus =
-  | "pass"
-  | "pass-with-visual-differences"
-  | "incomplete"
-  | "fail";
+  "pass" | "pass-with-visual-differences" | "incomplete" | "fail";
 
 export interface StressSlideEvidence {
   slide: number;
@@ -54,7 +51,8 @@ export function buildStressScorecard(
     (total, slide) => total + slide.layerFailures,
     0,
   );
-  const typographyFailures = evidence.undersizedTextBoxCount +
+  const typographyFailures =
+    evidence.undersizedTextBoxCount +
     evidence.slides.reduce(
       (total, slide) => total + slide.typographyFailures,
       0,
@@ -64,7 +62,7 @@ export function buildStressScorecard(
   const editability = passWhen(missingText === 0);
   const rasterPolicy = passWhen(
     evidence.unauthorizedRasterCount === 0 &&
-    evidence.fullSlideRasterCount === 0,
+      evidence.fullSlideRasterCount === 0,
   );
   const typography = passWhen(typographyFailures === 0);
   const layerOrder = passWhen(layerFailures === 0);
@@ -123,9 +121,7 @@ async function writeFromCli(): Promise<void> {
   );
 }
 
-const entryPoint = process.argv[1]
-  ? path.resolve(process.argv[1])
-  : "";
+const entryPoint = process.argv[1] ? path.resolve(process.argv[1]) : "";
 if (entryPoint === path.resolve(fileURLToPath(import.meta.url))) {
   await writeFromCli();
 }

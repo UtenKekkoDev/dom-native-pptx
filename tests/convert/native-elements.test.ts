@@ -36,10 +36,12 @@ function textNode(): DomNodeSnapshot {
 
 describe("native conversion primitives", () => {
   it("maps 1920x1080 pixels to a 13.333x7.5 inch slide", () => {
-    expect(pxRectToInches(
-      { x: 960, y: 540, width: 960, height: 540 },
-      { width: 1920, height: 1080 },
-    )).toEqual({
+    expect(
+      pxRectToInches(
+        { x: 960, y: 540, width: 960, height: 540 },
+        { width: 1920, height: 1080 },
+      ),
+    ).toEqual({
       x: 6.6665,
       y: 3.75,
       width: 6.6665,

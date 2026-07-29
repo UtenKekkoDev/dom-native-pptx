@@ -41,8 +41,7 @@ describe("authorized raster capture", () => {
 
   it("captures only the selected authorized element", async () => {
     let captured:
-      | { selector: string; options: Record<string, unknown> }
-      | undefined;
+      { selector: string; options: Record<string, unknown> } | undefined;
     const page = {
       locator(selector: string) {
         return {
@@ -55,7 +54,9 @@ describe("authorized raster capture", () => {
                 channels: 4,
                 background: { r: 60, g: 10, b: 80, alpha: 0.1 },
               },
-            }).png().toFile(options.path as string);
+            })
+              .png()
+              .toFile(options.path as string);
           },
         };
       },

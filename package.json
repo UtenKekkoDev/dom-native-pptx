@@ -23,6 +23,8 @@
     "THIRD_PARTY_NOTICES.md",
     "ARCHITECTURE.md",
     "RASTER_POLICY.md",
+    "SECURITY.md",
+    "SOURCE_MAP.md",
     "SUPPORTED_CSS.md"
   ],
   "engines": {
@@ -52,8 +54,12 @@
   "scripts": {
     "prebuild": "node scripts/clean-dist.mjs",
     "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint src tests scripts",
+    "format": "prettier --write src tests scripts .github *.md *.json *.ts *.js",
+    "format:check": "prettier --check src tests scripts .github *.md *.json *.ts *.js",
     "test": "vitest",
-    "test:run": "vitest run",
+    "test:run": "vitest run --pool=forks --maxWorkers=1 --bail=1",
+    "test:coverage": "vitest run --coverage --pool=forks --maxWorkers=1 --bail=1",
     "test:package": "npm run build && node scripts/verify-package.mjs",
     "audit:licenses": "node scripts/audit-licenses.mjs",
     "test:stress": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-stress-suite.ps1",
@@ -65,25 +71,28 @@
     "pptx:compare": "tsx src/cli.ts compare"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^24.0.0",
     "@types/pixelmatch": "^5.2.6",
     "@types/pngjs": "^6.0.5",
+    "@vitest/coverage-v8": "^3.2.7",
     "eslint": "^10.7.0",
+    "globals": "^17.8.0",
     "prettier": "^3.9.5",
     "tsx": "^4.20.0",
     "typescript": "^5.8.0",
+    "typescript-eslint": "^8.65.0",
     "vitest": "^3.2.0"
   },
   "dependencies": {
+    "@xmldom/xmldom": "^0.8.13",
     "commander": "^15.0.0",
-    "dom-to-pptx": "^2.0.3",
-    "fast-xml-parser": "^5.10.1",
-    "fontkit": "^2.0.4",
     "jszip": "^3.10.1",
     "pixelmatch": "^7.2.0",
     "playwright": "^1.61.1",
     "pngjs": "^7.0.0",
     "pptxgenjs": "^4.0.1",
+    "saxes": "6.0.0",
     "sharp": "^0.35.3",
     "zod": "^4.4.3"
   }

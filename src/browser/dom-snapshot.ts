@@ -1,8 +1,5 @@
-import path from "node:path";
-import { pathToFileURL } from "node:url";
-import type { DomNodeSnapshot } from "../types.js";
-import { launchBrowser } from "./launch-browser.js";
-import { waitForAssets } from "./wait-for-assets.js";
+import type { DomNodeSnapshot, SecurityMode } from "../types.js";
+import { openSlidePage } from "./slide-page-session.js";
 
 const STYLE_PROPERTIES = [
   "fontFamily",
@@ -42,20 +39,31 @@ const STYLE_PROPERTIES = [
   "overflow",
 ] as const;
 
+/** @deprecated Pass the selector through `SnapshotOptions` instead. */
+export function snapshotDeck(
+  inputPath: string,
+  selector: string,
+): Promise<DomNodeSnapshot[][]>;
+export function snapshotDeck(
+  inputPath: string,
+  options?: SnapshotOptions,
+): Promise<DomNodeSnapshot[][]>;
 export async function snapshotDeck(
   inputPath: string,
-  selector = ".pptx-slide",
+  optionsOrSelector: SnapshotOptions | string = {},
 ): Promise<DomNodeSnapshot[][]> {
-  const browser = await launchBrowser();
+  const options =
+    typeof optionsOrSelector === "string"
+      ? { selector: optionsOrSelector }
+      : optionsOrSelector;
+  const selector = options.selector ?? ".pptx-slide";
+  const session = await openSlidePage({
+    inputPath,
+    securityMode: options.securityMode,
+    timeoutMs: options.timeoutMs,
+  });
   try {
-    const page = await browser.newPage({
-      viewport: { width: 1920, height: 1080 },
-      deviceScaleFactor: 1,
-    });
-    await page.goto(pathToFileURL(path.resolve(inputPath)).href, {
-      waitUntil: "load",
-    });
-    await waitForAssets(page);
+    const { page } = session;
 
     const count = await page.locator(selector).count();
     if (count === 0) {
@@ -205,6 +213,12 @@ export async function snapshotDeck(
     `;
     return await page.evaluate<DomNodeSnapshot[][]>(browserScript);
   } finally {
-    await browser.close();
+    await session.close();
   }
+}
+
+export interface SnapshotOptions {
+  selector?: string;
+  securityMode?: SecurityMode;
+  timeoutMs?: number;
 }

@@ -1,27 +1,65 @@
 import fs from "node:fs/promises";
 import JSZip from "jszip";
-import type { ConversionRecord } from "../types.js";
+import type { ConversionRecord, SecurityMode } from "../types.js";
 import {
   extractTextNodes,
   findMissingProtectedText,
   type MissingProtectedText,
 } from "./native-text.js";
 import { auditRasterUsage } from "./raster-usage.js";
+import {
+  findUndersizedTextBoxes,
+  type UndersizedTextBox,
+} from "./text-box-measurement.js";
 
 export interface ValidationReport {
   ok: boolean;
+  securityMode: SecurityMode;
+  warnings: string[];
   pptxPath: string;
   manifestPath: string;
   slideCount: number;
   nativeTexts: string[];
   chartTexts: string[];
   missingProtectedText: MissingProtectedText[];
+  undersizedTextBoxes: UndersizedTextBox[];
   unauthorizedRasterRecords: ConversionRecord[];
   authorizedRasterRecords: ConversionRecord[];
   mediaFileCount: number;
   unmanifestedMediaCount: number;
   fullSlideRasterCount: number;
   errors: string[];
+}
+
+interface ConversionManifestData {
+  schemaVersion?: unknown;
+  securityMode?: unknown;
+  records?: ConversionRecord[];
+}
+
+function manifestSecurity(manifest: ConversionManifestData): {
+  securityMode: SecurityMode;
+  warnings: string[];
+} {
+  if (manifest.schemaVersion === 1) {
+    return {
+      securityMode: "trusted",
+      warnings: [
+        "Manifest schema version 1 used an unrestricted browser policy; securityMode defaults to trusted.",
+      ],
+    };
+  }
+  if (manifest.schemaVersion !== 2) {
+    throw new Error(
+      `Unsupported conversion manifest schema version: ${String(manifest.schemaVersion)}`,
+    );
+  }
+  if (manifest.securityMode !== "safe" && manifest.securityMode !== "trusted") {
+    throw new Error(
+      'Manifest schema version 2 requires securityMode to be "safe" or "trusted".',
+    );
+  }
+  return { securityMode: manifest.securityMode, warnings: [] };
 }
 
 function slideNumber(name: string): number {
@@ -71,19 +109,23 @@ export async function inspectPptx(
 
   const manifest = JSON.parse(
     await fs.readFile(manifestPath, "utf8"),
-  ) as { records?: ConversionRecord[] };
+  ) as ConversionManifestData;
+  const { securityMode, warnings } = manifestSecurity(manifest);
   const records = manifest.records ?? [];
   const missingProtectedText = findMissingProtectedText(
     records,
     slideTexts,
     chartTexts,
   );
+  const undersizedTextBoxes = slideXmlDocuments.flatMap((xml, index) =>
+    findUndersizedTextBoxes(xml, slideNumber(slideNames[index])),
+  );
 
-  const mediaFileCount = Object.keys(zip.files)
-    .filter((name) => /^ppt\/media\/[^/]+$/u.test(name))
-    .length;
-  const presentationXml = await zip.file("ppt/presentation.xml")?.async("string")
-    ?? "";
+  const mediaFileCount = Object.keys(zip.files).filter((name) =>
+    /^ppt\/media\/[^/]+$/u.test(name),
+  ).length;
+  const presentationXml =
+    (await zip.file("ppt/presentation.xml")?.async("string")) ?? "";
   const rasterAudit = auditRasterUsage(
     records,
     slideXmlDocuments,
@@ -115,12 +157,15 @@ export async function inspectPptx(
 
   return {
     ok: errors.length === 0,
+    securityMode,
+    warnings,
     pptxPath,
     manifestPath,
     slideCount: slideNames.length,
     nativeTexts,
     chartTexts,
     missingProtectedText,
+    undersizedTextBoxes,
     unauthorizedRasterRecords: rasterAudit.unauthorizedRasterRecords,
     authorizedRasterRecords: rasterAudit.authorizedRasterRecords,
     mediaFileCount,

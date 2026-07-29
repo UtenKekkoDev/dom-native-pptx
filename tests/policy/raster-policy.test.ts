@@ -21,12 +21,16 @@ function node(overrides: Partial<DomNodeSnapshot> = {}): DomNodeSnapshot {
 
 describe("raster policy", () => {
   it("allows an explicitly whitelisted photo without protected text", () => {
-    expect(evaluateRasterPolicy(node({
-      attributes: {
-        "data-pptx-raster": "allowed",
-        "data-pptx-raster-role": "photo",
-      },
-    }))).toEqual({
+    expect(
+      evaluateRasterPolicy(
+        node({
+          attributes: {
+            "data-pptx-raster": "allowed",
+            "data-pptx-raster-role": "photo",
+          },
+        }),
+      ),
+    ).toEqual({
       allowed: true,
       role: "photo",
       reason: "explicit-whitelist",
@@ -41,32 +45,44 @@ describe("raster policy", () => {
       ownText: "这段正文必须保留为可编辑文字",
     });
 
-    expect(() => evaluateRasterPolicy(node({
-      selector: "#photo",
-      text: body.text,
-      attributes: {
-        "data-pptx-raster": "allowed",
-        "data-pptx-raster-role": "photo",
-      },
-      children: [body],
-    }))).toThrow(/protected text.*#photo p.*这段正文/u);
+    expect(() =>
+      evaluateRasterPolicy(
+        node({
+          selector: "#photo",
+          text: body.text,
+          attributes: {
+            "data-pptx-raster": "allowed",
+            "data-pptx-raster-role": "photo",
+          },
+          children: [body],
+        }),
+      ),
+    ).toThrow(/protected text.*#photo p.*这段正文/u);
   });
 
   it("rejects rasterization without an approved role", () => {
-    expect(() => evaluateRasterPolicy(node({
-      attributes: {
-        "data-pptx-raster": "allowed",
-        "data-pptx-raster-role": "unknown",
-      },
-    }))).toThrow(/approved raster role/i);
+    expect(() =>
+      evaluateRasterPolicy(
+        node({
+          attributes: {
+            "data-pptx-raster": "allowed",
+            "data-pptx-raster-role": "unknown",
+          },
+        }),
+      ),
+    ).toThrow(/approved raster role/i);
   });
 
   it("rejects an approved role without the explicit opt-in flag", () => {
-    expect(() => evaluateRasterPolicy(node({
-      attributes: {
-        "data-pptx-raster-role": "logo",
-      },
-    }))).toThrow(/explicit raster whitelist/i);
+    expect(() =>
+      evaluateRasterPolicy(
+        node({
+          attributes: {
+            "data-pptx-raster-role": "logo",
+          },
+        }),
+      ),
+    ).toThrow(/explicit raster whitelist/i);
   });
 
   it("allows text only for the brand-lockup role", () => {
@@ -77,15 +93,19 @@ describe("raster policy", () => {
       ownText: "VivaReel",
     });
 
-    expect(evaluateRasterPolicy(node({
-      selector: "#brand-lockup",
-      text: "VivaReel",
-      attributes: {
-        "data-pptx-raster": "allowed",
-        "data-pptx-raster-role": "brand-lockup",
-      },
-      children: [logoText],
-    }))).toEqual({
+    expect(
+      evaluateRasterPolicy(
+        node({
+          selector: "#brand-lockup",
+          text: "VivaReel",
+          attributes: {
+            "data-pptx-raster": "allowed",
+            "data-pptx-raster-role": "brand-lockup",
+          },
+          children: [logoText],
+        }),
+      ),
+    ).toEqual({
       allowed: true,
       role: "brand-lockup",
       reason: "explicit-whitelist",
@@ -103,14 +123,18 @@ describe("raster policy", () => {
       },
     });
 
-    expect(() => evaluateRasterPolicy(node({
-      selector: "#brand-lockup",
-      text: caption.text,
-      attributes: {
-        "data-pptx-raster": "allowed",
-        "data-pptx-raster-role": "brand-lockup",
-      },
-      children: [caption],
-    }))).toThrow(/protected text.*全球 AI 影视平台/u);
+    expect(() =>
+      evaluateRasterPolicy(
+        node({
+          selector: "#brand-lockup",
+          text: caption.text,
+          attributes: {
+            "data-pptx-raster": "allowed",
+            "data-pptx-raster-role": "brand-lockup",
+          },
+          children: [caption],
+        }),
+      ),
+    ).toThrow(/protected text.*全球 AI 影视平台/u);
   });
 });

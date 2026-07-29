@@ -1,11 +1,134 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><style>
-*{box-sizing:border-box}html,body{margin:0}.pptx-slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:#170d25;color:#fff;font-family:"Microsoft YaHei"}
-h1{position:absolute;left:120px;top:140px;margin:0;font-size:72px}.copy{position:absolute;left:120px;top:280px;width:1200px;margin:0;font-size:30px;color:#d8cce6}
-.cards{position:absolute;left:120px;top:390px;width:1680px;display:grid;grid-template-columns:repeat(3,1fr);gap:28px}.card{height:360px;padding:40px;background:#28183b;border:2px solid #5d3a7d}.card h2{margin:0 0 20px;font-size:34px}.card p{margin:0;font-size:24px;color:#d8cce6}
-table{position:absolute;left:120px;top:370px;width:1680px;height:500px;border-collapse:collapse;background:#fff;color:#20152a}th,td{border:2px solid #d7c9e3;padding:24px;font-size:26px}th{background:#6d35a8;color:#fff}
-</style></head><body>
-<section class="pptx-slide"><h1 data-pptx-text-role="title">安装后的 Skill 冒烟测试</h1><p class="copy" data-pptx-text-role="body">该三页演示必须完成原生导出、OOXML 审计与 Microsoft PowerPoint 渲染。</p></section>
-<section class="pptx-slide"><h1 data-pptx-text-role="title">三项不可妥协的规则</h1><div class="cards"><article class="card"><h2 data-pptx-text-role="subtitle">正文原生</h2><p data-pptx-text-role="body">标题和正文不能成为图片。</p></article><article class="card"><h2 data-pptx-text-role="subtitle">栅格白名单</h2><p data-pptx-text-role="body">只有明确授权的视觉资产可捕获。</p></article><article class="card"><h2 data-pptx-text-role="subtitle">PowerPoint QA</h2><p data-pptx-text-role="body">最终渲染以微软 PowerPoint 为准。</p></article></div></section>
-<section class="pptx-slide"><h1 data-pptx-text-role="title">原生表格验证</h1><table><thead><tr><th>检查项</th><th>结果</th></tr></thead><tbody><tr><td>保护文字</td><td>原生</td></tr><tr><td>整页截图</td><td>零</td></tr><tr><td>PowerPoint 渲染</td><td>通过</td></tr></tbody></table></section>
-</body></html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+      }
+      .pptx-slide {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #170d25;
+        color: #fff;
+        font-family: "Microsoft YaHei";
+      }
+      h1 {
+        position: absolute;
+        left: 120px;
+        top: 140px;
+        margin: 0;
+        font-size: 72px;
+      }
+      .copy {
+        position: absolute;
+        left: 120px;
+        top: 280px;
+        width: 1200px;
+        margin: 0;
+        font-size: 30px;
+        color: #d8cce6;
+      }
+      .cards {
+        position: absolute;
+        left: 120px;
+        top: 390px;
+        width: 1680px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 28px;
+      }
+      .card {
+        height: 360px;
+        padding: 40px;
+        background: #28183b;
+        border: 2px solid #5d3a7d;
+      }
+      .card h2 {
+        margin: 0 0 20px;
+        font-size: 34px;
+      }
+      .card p {
+        margin: 0;
+        font-size: 24px;
+        color: #d8cce6;
+      }
+      table {
+        position: absolute;
+        left: 120px;
+        top: 370px;
+        width: 1680px;
+        height: 500px;
+        border-collapse: collapse;
+        background: #fff;
+        color: #20152a;
+      }
+      th,
+      td {
+        border: 2px solid #d7c9e3;
+        padding: 24px;
+        font-size: 26px;
+      }
+      th {
+        background: #6d35a8;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="pptx-slide">
+      <h1 data-pptx-text-role="title">安装后的 Skill 冒烟测试</h1>
+      <p class="copy" data-pptx-text-role="body">
+        该三页演示必须完成原生导出、OOXML 审计与 Microsoft PowerPoint 渲染。
+      </p>
+    </section>
+    <section class="pptx-slide">
+      <h1 data-pptx-text-role="title">三项不可妥协的规则</h1>
+      <div class="cards">
+        <article class="card">
+          <h2 data-pptx-text-role="subtitle">正文原生</h2>
+          <p data-pptx-text-role="body">标题和正文不能成为图片。</p>
+        </article>
+        <article class="card">
+          <h2 data-pptx-text-role="subtitle">栅格白名单</h2>
+          <p data-pptx-text-role="body">只有明确授权的视觉资产可捕获。</p>
+        </article>
+        <article class="card">
+          <h2 data-pptx-text-role="subtitle">PowerPoint QA</h2>
+          <p data-pptx-text-role="body">最终渲染以微软 PowerPoint 为准。</p>
+        </article>
+      </div>
+    </section>
+    <section class="pptx-slide">
+      <h1 data-pptx-text-role="title">原生表格验证</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>检查项</th>
+            <th>结果</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>保护文字</td>
+            <td>原生</td>
+          </tr>
+          <tr>
+            <td>整页截图</td>
+            <td>零</td>
+          </tr>
+          <tr>
+            <td>PowerPoint 渲染</td>
+            <td>通过</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </body>
+</html>

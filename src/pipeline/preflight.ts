@@ -3,10 +3,7 @@ import { extractTableRows } from "../convert/table-converter.js";
 import { evaluateRasterPolicy } from "../policy/raster-policy.js";
 import { explicitTextRole } from "../policy/text-policy.js";
 import { classifyVisualEffects } from "../policy/visual-effect-policy.js";
-import {
-  ConversionPolicyError,
-  type DomNodeSnapshot,
-} from "../types.js";
+import { ConversionPolicyError, type DomNodeSnapshot } from "../types.js";
 
 function pseudoText(value: string | undefined): string {
   const content = (value ?? "").trim();
@@ -28,7 +25,8 @@ function rejectNonNativeContent(node: DomNodeSnapshot): void {
       slide: node.slide,
       selector: node.selector,
       textPreview: text.slice(0, 120),
-      reason: "Visible pseudo-element text cannot become native PowerPoint text",
+      reason:
+        "Visible pseudo-element text cannot become native PowerPoint text",
       suggestedRepair:
         "Move the generated content into a real HTML text element with data-pptx-text-role.",
     });
@@ -99,8 +97,7 @@ function inspectNode(node: DomNodeSnapshot): void {
       slide: node.slide,
       selector: node.selector,
       textPreview: node.text.slice(0, 120),
-      reason:
-        `${unsupported.property} cannot be represented faithfully as a native PowerPoint shape`,
+      reason: `${unsupported.property} cannot be represented faithfully as a native PowerPoint shape`,
       suggestedRepair: hasSemanticText
         ? "Move the visual effect to a separate text-free element, explicitly authorize only that visual node for raster capture, and keep semantic text native."
         : "Explicitly authorize this isolated visual-only node for raster capture or replace the effect with supported native shapes.",

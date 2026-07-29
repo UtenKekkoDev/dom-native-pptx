@@ -13,8 +13,11 @@ export interface TextSlideTarget {
   addText(text: string, options: Record<string, unknown>): unknown;
 }
 
-function horizontalAlign(value: string | undefined): "left" | "center" | "right" | "justify" {
-  if (value === "center" || value === "right" || value === "justify") return value;
+function horizontalAlign(
+  value: string | undefined,
+): "left" | "center" | "right" | "justify" {
+  if (value === "center" || value === "right" || value === "justify")
+    return value;
   return "left";
 }
 
@@ -42,14 +45,11 @@ export function addNativeText(
     Math.abs(node.rect.width - naturalWidth) <= 2;
   const safeWidth = isIntrinsicTextWidth
     ? Math.min(
-      HTML_CANVAS.width - node.rect.x,
-      node.rect.width + Math.max(4, fontPixels * 0.25),
-    )
+        HTML_CANVAS.width - node.rect.x,
+        node.rect.width + Math.max(4, fontPixels * 0.25),
+      )
     : node.rect.width;
-  const rect = pxRectToInches(
-    { ...node.rect, width: safeWidth },
-    HTML_CANVAS,
-  );
+  const rect = pxRectToInches({ ...node.rect, width: safeWidth }, HTML_CANVAS);
   const color = cssColorToPptx(node.style.color);
   const fontSize = cssPixelsToPoints(node.style.fontSize || "16px", 12);
   const weight = Number.parseInt(node.style.fontWeight || "400", 10);
@@ -62,7 +62,8 @@ export function addNativeText(
     fontFace: firstFontFamily(node.style.fontFamily),
     fontSize,
     bold: Number.isFinite(weight) && weight >= 600,
-    italic: node.style.fontStyle === "italic" || node.style.fontStyle === "oblique",
+    italic:
+      node.style.fontStyle === "italic" || node.style.fontStyle === "oblique",
     color: color.color,
     transparency: color.transparency,
     margin: 0,

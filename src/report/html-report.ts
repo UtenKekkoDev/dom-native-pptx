@@ -15,7 +15,14 @@ export async function writeValidationHtml(
 ): Promise<void> {
   const status = report.ok ? "PASS" : "FAIL";
   const payload = escapeHtml(JSON.stringify(report, null, 2));
-  await fs.writeFile(outputPath, `<!doctype html>
+  const warnings = report.warnings.length
+    ? `<section class="warnings"><h2>Warnings</h2><ul>${report.warnings
+        .map((warning) => `<li>${escapeHtml(warning)}</li>`)
+        .join("")}</ul></section>`
+    : "";
+  await fs.writeFile(
+    outputPath,
+    `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -26,6 +33,7 @@ body{font:16px/1.55 system-ui;margin:40px;max-width:1100px;color:#21182a}
 .metrics{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:12px}
 .metric{padding:16px;border:1px solid #d8d0df;border-radius:10px}
 .metric strong{display:block;font-size:28px}
+.warnings{margin:20px 0;padding:16px;border:1px solid #c57900;border-radius:10px;background:#fff8e6;color:#684100}
 pre{white-space:pre-wrap;background:#f7f3fa;padding:20px;border-radius:10px}
 </style>
 </head>
@@ -33,12 +41,16 @@ pre{white-space:pre-wrap;background:#f7f3fa;padding:20px;border-radius:10px}
 <h1 class="${report.ok ? "pass" : "fail"}">${status}</h1>
 <div class="metrics">
   <div class="metric"><strong>${report.slideCount}</strong>Slides</div>
+  <div class="metric"><strong>${escapeHtml(report.securityMode.toUpperCase())}</strong>Security mode</div>
   <div class="metric"><strong>${report.nativeTexts.length}</strong>Native text nodes</div>
   <div class="metric"><strong>${report.authorizedRasterRecords.length}</strong>Authorized rasters</div>
   <div class="metric"><strong>${report.errors.length}</strong>Errors</div>
 </div>
+${warnings}
 <h2>Validation report</h2>
 <pre>${payload}</pre>
 </body>
-</html>`, "utf8");
+</html>`,
+    "utf8",
+  );
 }

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      html,
+      body {
+        margin: 0;
+      }
+      .pptx-slide {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+      }
+      #too-short {
+        position: absolute;
+        left: 120px;
+        top: 120px;
+        width: 900px;
+        height: 10px;
+        margin: 0;
+        overflow: visible;
+        font: 700 64px "Microsoft YaHei";
+      }
+    </style>
+  </head>
+  <body>
+    <section class="pptx-slide">
+      <h1 id="too-short" data-pptx-text-role="title">
+        This native textbox is too short
+      </h1>
+    </section>
+  </body>
+</html>

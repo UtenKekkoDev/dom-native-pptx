@@ -39,10 +39,12 @@ export function auditRasterUsage(
   mediaFileCount: number,
   slideSize: { width: number; height: number },
 ): RasterAudit {
-  const unauthorizedRasterRecords = records.filter((record) =>
-    record.rasterized && !record.rasterAuthorized);
-  const authorizedRasterRecords = records.filter((record) =>
-    record.rasterized && record.rasterAuthorized);
+  const unauthorizedRasterRecords = records.filter(
+    (record) => record.rasterized && !record.rasterAuthorized,
+  );
+  const authorizedRasterRecords = records.filter(
+    (record) => record.rasterized && record.rasterAuthorized,
+  );
   const fullSlideRasterCount = slideXmlDocuments.reduce(
     (total, xml) =>
       total + fullSlidePictures(xml, slideSize.width, slideSize.height),

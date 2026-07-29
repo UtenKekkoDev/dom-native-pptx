@@ -19,8 +19,13 @@ export function cssColorToPptx(
   const hex = value.match(/^#([\da-f]{3}|[\da-f]{6}|[\da-f]{8})$/iu);
   if (hex) {
     let raw = hex[1];
-    if (raw.length === 3) raw = raw.split("").map((part) => part + part).join("");
-    const alpha = raw.length === 8 ? Number.parseInt(raw.slice(6, 8), 16) / 255 : 1;
+    if (raw.length === 3)
+      raw = raw
+        .split("")
+        .map((part) => part + part)
+        .join("");
+    const alpha =
+      raw.length === 8 ? Number.parseInt(raw.slice(6, 8), 16) / 255 : 1;
     return {
       color: raw.slice(0, 6).toUpperCase(),
       transparency: Math.round((1 - alpha) * 100),
@@ -32,7 +37,8 @@ export function cssColorToPptx(
   );
   if (!rgb) return { color: fallback, transparency: 0 };
 
-  const color = rgb.slice(1, 4)
+  const color = rgb
+    .slice(1, 4)
     .map((part) => channel(part).toString(16).padStart(2, "0"))
     .join("")
     .toUpperCase();

@@ -4,5 +4,10 @@ export default defineConfig({
   test: {
     environment: "node",
     testTimeout: 30_000,
+    coverage: {
+      provider: "v8",
+      reportsDirectory: "coverage",
+      include: ["src/**/*.ts"],
+    },
   },
 });

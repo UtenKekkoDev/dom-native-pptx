@@ -6,14 +6,13 @@ const lock = JSON.parse(fs.readFileSync("package-lock.json", "utf8"));
 function licenseFromInstalledFiles(packagePath) {
   const absolutePackagePath = path.resolve(packagePath);
   if (!fs.existsSync(absolutePackagePath)) return null;
-  const licenseFile = fs.readdirSync(absolutePackagePath).find((name) =>
-    /^licen[cs]e(?:\.|$)/iu.test(name),
-  );
+  const licenseFile = fs
+    .readdirSync(absolutePackagePath)
+    .find((name) => /^licen[cs]e(?:\.|$)/iu.test(name));
   if (!licenseFile) return null;
-  const text = fs.readFileSync(
-    path.join(absolutePackagePath, licenseFile),
-    "utf8",
-  ).slice(0, 1000);
+  const text = fs
+    .readFileSync(path.join(absolutePackagePath, licenseFile), "utf8")
+    .slice(0, 1000);
   if (/MIT License|The MIT License/iu.test(text)) return "MIT (LICENSE file)";
   if (/Apache License[\s\S]*Version 2\.0/iu.test(text)) {
     return "Apache-2.0 (LICENSE file)";
@@ -25,8 +24,9 @@ function licenseFromInstalledFiles(packagePath) {
 }
 
 const packages = Object.entries(lock.packages)
-  .filter(([packagePath, metadata]) =>
-    packagePath.startsWith("node_modules/") && !metadata.dev,
+  .filter(
+    ([packagePath, metadata]) =>
+      packagePath.startsWith("node_modules/") && !metadata.dev,
   )
   .map(([packagePath, metadata]) => ({
     name: packagePath.slice("node_modules/".length),
@@ -60,9 +60,9 @@ if (process.argv.includes("--json")) {
 } else {
   process.stdout.write(
     `Production packages: ${report.productionPackages}\n` +
-    `License groups: ${JSON.stringify(report.licenseCounts)}\n` +
-    `Unresolved: ${report.unresolved.length}\n` +
-    `Copyleft or combined-license packages: ${report.copyleftOrCombined.length}\n`,
+      `License groups: ${JSON.stringify(report.licenseCounts)}\n` +
+      `Unresolved: ${report.unresolved.length}\n` +
+      `Copyleft or combined-license packages: ${report.copyleftOrCombined.length}\n`,
   );
 }
 

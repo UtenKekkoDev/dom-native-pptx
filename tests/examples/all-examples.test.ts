@@ -38,12 +38,12 @@ describe("example decks", () => {
     const output = path.resolve(".tmp/examples/09-raster-policy-failure.pptx");
     await fs.rm(output, { force: true });
 
-    await expect(exportDeck({
-      input: path.resolve(
-        "examples/09-raster-policy-failure/slides.html",
-      ),
-      output,
-    })).rejects.toThrow(/protected text/i);
+    await expect(
+      exportDeck({
+        input: path.resolve("examples/09-raster-policy-failure/slides.html"),
+        output,
+      }),
+    ).rejects.toThrow(/protected text/i);
     await expect(fs.stat(output)).rejects.toThrow();
   });
 });

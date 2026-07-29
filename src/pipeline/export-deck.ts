@@ -1,10 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
 import PptxGenJS from "pptxgenjs";
 import { snapshotDeck } from "../browser/dom-snapshot.js";
-import { launchBrowser } from "../browser/launch-browser.js";
-import { waitForAssets } from "../browser/wait-for-assets.js";
+import { openSlidePage } from "../browser/slide-page-session.js";
 import {
   captureAuthorizedRaster,
   setRasterCaptureBackground,
@@ -34,7 +32,7 @@ import {
 } from "../convert/text-converter.js";
 import { explicitTextRole } from "../policy/text-policy.js";
 import { writeValidationHtml } from "../report/html-report.js";
-import type { DomNodeSnapshot } from "../types.js";
+import type { DomNodeSnapshot, SecurityMode } from "../types.js";
 import { inspectPptx } from "../validate/pptx-xml.js";
 import { ConversionManifest } from "./manifest.js";
 import { orderSiblingsForPptx } from "./paint-order.js";
@@ -43,6 +41,8 @@ import { preflight } from "./preflight.js";
 export interface ExportOptions {
   input: string;
   output: string;
+  securityMode?: SecurityMode;
+  timeoutMs?: number;
 }
 
 export interface ExportResult {
@@ -59,13 +59,11 @@ interface RenderContext {
   rasterAssets: Map<string, string>;
 }
 
-type NativeSlideTarget =
-  & TextSlideTarget
-  & ShapeSlideTarget
-  & ChartSlideTarget
-  & TableSlideTarget
-  & ImageSlideTarget
-  & { background: { color: string } };
+type NativeSlideTarget = TextSlideTarget &
+  ShapeSlideTarget &
+  ChartSlideTarget &
+  TableSlideTarget &
+  ImageSlideTarget & { background: { color: string } };
 
 interface NativeDeckTarget {
   layout: string;
@@ -84,16 +82,14 @@ interface NativeDeckTarget {
 }
 
 type PptxConstructorType = {
-  new(): NativeDeckTarget;
+  new (): NativeDeckTarget;
 };
 
 const importedPptx = PptxGenJS as unknown as {
   default?: PptxConstructorType;
 };
-const PptxConstructor = (
-  importedPptx.default ??
-  PptxGenJS
-) as unknown as PptxConstructorType;
+const PptxConstructor = (importedPptx.default ??
+  PptxGenJS) as unknown as PptxConstructorType;
 
 function nodeKey(node: DomNodeSnapshot): string {
   return `${node.slide}:${node.selector}`;
@@ -124,11 +120,15 @@ function shouldRenderText(node: DomNodeSnapshot): boolean {
 function renderNode(node: DomNodeSnapshot, context: RenderContext): void {
   if (!node.visible) return;
 
-  if ("data-pptx-raster" in node.attributes ||
-      "data-pptx-raster-role" in node.attributes) {
+  if (
+    "data-pptx-raster" in node.attributes ||
+    "data-pptx-raster-role" in node.attributes
+  ) {
     const asset = context.rasterAssets.get(nodeKey(node));
     if (!asset) {
-      throw new Error(`Authorized raster asset was not captured: ${nodeKey(node)}`);
+      throw new Error(
+        `Authorized raster asset was not captured: ${nodeKey(node)}`,
+      );
     }
     const role = node.attributes["data-pptx-raster-role"];
     addImageAsset(
@@ -137,7 +137,12 @@ function renderNode(node: DomNodeSnapshot, context: RenderContext): void {
       asset,
       {
         allowed: true,
-        role: role as "logo" | "brand-lockup" | "photo" | "illustration" | "decorative-composite",
+        role: role as
+          | "logo"
+          | "brand-lockup"
+          | "photo"
+          | "illustration"
+          | "decorative-composite",
         reason: "explicit-whitelist",
       },
       context.manifest,
@@ -165,9 +170,10 @@ function renderNode(node: DomNodeSnapshot, context: RenderContext): void {
   }
 
   if (shouldRenderText(node)) {
-    const text = explicitTextRole(node) || node.children.length === 0
-      ? node.text
-      : node.ownText;
+    const text =
+      explicitTextRole(node) || node.children.length === 0
+        ? node.text
+        : node.ownText;
     const textNode = text === node.text ? node : { ...node, text };
     context.manifest.expectText(node.slide, node.selector, text);
     addNativeText(context.slide, textNode, context.manifest);
@@ -179,13 +185,13 @@ function renderNode(node: DomNodeSnapshot, context: RenderContext): void {
   }
 }
 
-function collectRasterNodes(
-  slides: DomNodeSnapshot[][],
-): DomNodeSnapshot[] {
+function collectRasterNodes(slides: DomNodeSnapshot[][]): DomNodeSnapshot[] {
   const output: DomNodeSnapshot[] = [];
   const visit = (node: DomNodeSnapshot): void => {
-    if ("data-pptx-raster" in node.attributes ||
-        "data-pptx-raster-role" in node.attributes) {
+    if (
+      "data-pptx-raster" in node.attributes ||
+      "data-pptx-raster-role" in node.attributes
+    ) {
       output.push(node);
       return;
     }
@@ -199,20 +205,19 @@ async function captureRasterAssets(
   input: string,
   nodes: DomNodeSnapshot[],
   outputDir: string,
+  securityMode: SecurityMode,
+  timeoutMs?: number,
 ): Promise<Map<string, string>> {
   const assets = new Map<string, string>();
   if (!nodes.length) return assets;
 
-  const browser = await launchBrowser();
+  const session = await openSlidePage({
+    inputPath: input,
+    securityMode,
+    timeoutMs,
+  });
   try {
-    const page = await browser.newPage({
-      viewport: { width: 1920, height: 1080 },
-      deviceScaleFactor: 1,
-    });
-    await page.goto(pathToFileURL(path.resolve(input)).href, {
-      waitUntil: "load",
-    });
-    await waitForAssets(page);
+    const { page } = session;
     await setRasterCaptureBackground(page, true);
     try {
       for (const node of nodes) {
@@ -247,7 +252,7 @@ async function captureRasterAssets(
     }
     return assets;
   } finally {
-    await browser.close();
+    await session.close();
   }
 }
 
@@ -256,7 +261,11 @@ export async function exportDeck(
 ): Promise<ExportResult> {
   const input = path.resolve(options.input);
   const output = path.resolve(options.output);
-  const snapshots = await snapshotDeck(input);
+  const securityMode = options.securityMode ?? "safe";
+  const snapshots = await snapshotDeck(input, {
+    securityMode,
+    timeoutMs: options.timeoutMs,
+  });
   preflight(snapshots);
 
   const assetDir = output.replace(/\.pptx$/iu, ".assets");
@@ -264,6 +273,8 @@ export async function exportDeck(
     input,
     collectRasterNodes(snapshots),
     assetDir,
+    securityMode,
+    options.timeoutMs,
   );
   const manifest = new ConversionManifest();
   const deck = new PptxConstructor();
@@ -299,19 +310,21 @@ export async function exportDeck(
   await fs.mkdir(path.dirname(output), { recursive: true });
   await deck.writeFile({ fileName: output });
 
-  const manifestPath = output.replace(
-    /\.pptx$/iu,
-    ".conversion-manifest.json",
-  );
+  const manifestPath = output.replace(/\.pptx$/iu, ".conversion-manifest.json");
   await fs.writeFile(
     manifestPath,
-    JSON.stringify({
-      schemaVersion: 1,
-      source: input,
-      output,
-      generatedAt: new Date().toISOString(),
-      records: manifest.records,
-    }, null, 2),
+    JSON.stringify(
+      {
+        schemaVersion: 2,
+        securityMode,
+        source: input,
+        output,
+        generatedAt: new Date().toISOString(),
+        records: manifest.records,
+      },
+      null,
+      2,
+    ),
     "utf8",
   );
   const validationJsonPath = output.replace(/\.pptx$/iu, ".validation.json");

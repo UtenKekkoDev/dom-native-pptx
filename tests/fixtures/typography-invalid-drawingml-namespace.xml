@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">
+  <p:cSld>
+    <p:spTree>
+      <p:sp>
+        <p:nvSpPr><p:cNvPr id="2" name="Missing DrawingML namespace"/></p:nvSpPr>
+        <p:spPr><xfrm><off x="0" y="0"/><ext cx="3657600" cy="1270000"/></xfrm></p:spPr>
+        <p:txBody><bodyPr/><lstStyle/><p><r><rPr sz="2000"/><t>Unqualified geometry must not count</t></r></p></p:txBody>
+      </p:sp>
+      <p:sp>
+        <p:nvSpPr><p:cNvPr id="3" name="Malformed DrawingML namespace"/></p:nvSpPr>
+        <p:spPr><a:xfrm xmlns:a="urn:vendor"><a:off x="0" y="0"/><a:ext cx="3657600" cy="1270000"/></a:xfrm></p:spPr>
+        <p:txBody xmlns:a="urn:vendor"><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr sz="2000"/><a:t>Wrong namespace geometry must not count</a:t></a:r></a:p></p:txBody>
+      </p:sp>
+    </p:spTree>
+  </p:cSld>
+</p:sld>

@@ -31,4 +31,12 @@ describe("dom-native-pptx skill contract", () => {
     expect(checklist).toMatch(/full[- ]size/i);
     expect(checklist).toMatch(/transparent corners|corner alpha/i);
   });
+
+  it("routes safe and trusted HTML through explicit security guidance", () => {
+    const skill = read("SKILL.md");
+    expect(skill).toContain("securityMode");
+    expect(skill).toContain("never silently skip");
+    expect(skill).toMatch(/safe mode.*default/i);
+    expect(skill).toMatch(/trusted HTML.*audited/i);
+  });
 });

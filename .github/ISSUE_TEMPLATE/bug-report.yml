@@ -1,0 +1,84 @@
+name: Bug report
+description: Report a reproducible conversion, validation, or render problem.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not attach private, customer, uploaded, licensed, or credential-bearing material.
+        First minimize the source HTML to a synthetic reproduction, then confirm it contains no private data.
+  - type: textarea
+    id: source-html
+    attributes:
+      label: Minimized source HTML
+      description: Provide the smallest synthetic source HTML reproduction, with no private or customer data.
+      placeholder: Paste a minimized, sanitized example or link to a public repository.
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      placeholder: Windows 11 24H2
+    validations:
+      required: true
+  - type: input
+    id: node-version
+    attributes:
+      label: Node version
+      placeholder: v22.x
+    validations:
+      required: true
+  - type: input
+    id: powerpoint-version
+    attributes:
+      label: PowerPoint version
+      placeholder: Microsoft 365 desktop build, or N/A
+    validations:
+      required: true
+  - type: dropdown
+    id: security-mode
+    attributes:
+      label: Security mode
+      options:
+        - safe
+        - trusted (audited HTML only)
+    validations:
+      required: true
+  - type: textarea
+    id: browser-render
+    attributes:
+      label: Browser render
+      description: Attach or describe the Chromium browser render of the minimized example.
+    validations:
+      required: true
+  - type: textarea
+    id: powerpoint-render
+    attributes:
+      label: PowerPoint render
+      description: Attach or describe the Microsoft PowerPoint render of the resulting deck.
+    validations:
+      required: true
+  - type: textarea
+    id: manifest
+    attributes:
+      label: Conversion manifest
+      description: Paste the relevant sanitized manifest details; do not include private paths or data.
+    validations:
+      required: true
+  - type: textarea
+    id: validation-report
+    attributes:
+      label: Validation report
+      description: Paste the relevant sanitized validation report details.
+    validations:
+      required: true
+  - type: checkboxes
+    id: private-data
+    attributes:
+      label: Privacy confirmation
+      options:
+        - label: I minimized the reproduction and confirm that no private or customer data is attached.
+          required: true

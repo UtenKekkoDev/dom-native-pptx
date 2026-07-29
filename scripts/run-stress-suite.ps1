@@ -69,6 +69,15 @@ try {
     throw "HTML/PowerPoint render count differs: $($htmlFiles.Count) vs $($powerpointFiles.Count)"
   }
 
+  $typographyEvidence = & $tsx "src/validate/stress-evidence.ts" $validationPath
+  if ($LASTEXITCODE -ne 0) {
+    throw "Validation report does not provide required typography evidence."
+  }
+  $undersizedTextBoxes = @(
+    (($typographyEvidence -join "`n" | ConvertFrom-Json).undersizedTextBoxes) |
+      Where-Object { $null -ne $_ }
+  )
+
   $stackRecords = @($manifest.records | Where-Object { $_.slide -eq 4 })
   $imageIndex = -1
   $captionIndex = -1
@@ -95,7 +104,7 @@ try {
       diffRatio = $diffRatio
       missingText = @($validation.missingProtectedText | Where-Object { $_.slide -eq $slideNumber }).Count
       layerFailures = if ($slideNumber -eq 4) { $stackFailure } else { 0 }
-      typographyFailures = @($validation.undersizedTextBoxes | Where-Object { $_.slide -eq $slideNumber }).Count
+      typographyFailures = @($undersizedTextBoxes | Where-Object { $_.slide -eq $slideNumber }).Count
     }
   }
 
@@ -103,7 +112,7 @@ try {
     structuralOk = [bool]$validation.ok
     unauthorizedRasterCount = @($validation.unauthorizedRasterRecords).Count
     fullSlideRasterCount = [int]$validation.fullSlideRasterCount
-    undersizedTextBoxCount = @($validation.undersizedTextBoxes).Count
+    undersizedTextBoxCount = $undersizedTextBoxes.Count
     powerpointAvailable = $powerpointAvailable
     powerpointOpenOk = $powerpointOpenOk
     slides = $slides

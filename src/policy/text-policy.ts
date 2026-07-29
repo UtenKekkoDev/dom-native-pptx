@@ -59,14 +59,10 @@ export function findProtectedText(
 }
 
 class ConversionPolicyTextError extends Error {
-  constructor(
-    node: DomNodeSnapshot,
-    reason: string,
-    repair: string,
-  ) {
+  constructor(node: DomNodeSnapshot, reason: string, repair: string) {
     super(
       `${reason}; slide=${node.slide}; selector=${node.selector}; ` +
-      `repair=${repair}`,
+        `repair=${repair}`,
     );
     this.name = "ConversionPolicyError";
   }
