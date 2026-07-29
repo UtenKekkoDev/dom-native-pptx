@@ -60,7 +60,7 @@ describe("GitHub prerelease contract", () => {
   it("is valid PowerShell syntax", () => {
     expect(fs.existsSync(builderPath)).toBe(true);
     const result = spawnSync(
-      "powershell.exe",
+      process.platform === "win32" ? "powershell.exe" : "pwsh",
       [
         "-NoProfile",
         "-Command",
