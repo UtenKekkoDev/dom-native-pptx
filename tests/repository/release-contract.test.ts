@@ -37,9 +37,9 @@ describe("GitHub prerelease contract", () => {
     const script = read(builderPath);
 
     for (const required of [
-      "0.2.0-beta.1",
+      "0.2.0-beta.2",
       "examples/10-full-business-deck/slides.html",
-      "dom-native-pptx-v0.2.0-beta.1-demo.pptx",
+      "dom-native-pptx-v0.2.0-beta.2-demo.pptx",
       "demo.conversion-manifest.json",
       "demo.validation.json",
       "demo.validation.html",

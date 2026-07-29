@@ -5,7 +5,7 @@ silently flattening titles, body text, numbers, tables, charts, sources, or
 page numbers into screenshots.
 
 > The GitHub repository is public. The npm package has not been published yet;
-> the current release candidate is `v0.2.0-beta.1`.
+> the current release candidate is `v0.2.0-beta.2`.
 
 **中文速览：** 这是一个以“正文必须原生可编辑”为硬约束的 HTML → PPTX
 转换器和 Agent Skill。先看[五分钟上手](#five-minute-quick-start)，或直接复制
@@ -20,7 +20,7 @@ Desktop from the generated editable deck.
 
 | Browser reference                                                                                                                                            | Microsoft PowerPoint authority                                                                                                                                                 |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ![Safe Chromium render of the IP monetization slide](https://raw.githubusercontent.com/UtenKekkoDev/dom-native-pptx/v0.2.0-beta.1/docs/assets/demo-html.png) | ![Microsoft PowerPoint render of the same IP monetization slide](https://raw.githubusercontent.com/UtenKekkoDev/dom-native-pptx/v0.2.0-beta.1/docs/assets/demo-powerpoint.png) |
+| ![Safe Chromium render of the IP monetization slide](https://raw.githubusercontent.com/UtenKekkoDev/dom-native-pptx/v0.2.0-beta.2/docs/assets/demo-html.png) | ![Microsoft PowerPoint render of the same IP monetization slide](https://raw.githubusercontent.com/UtenKekkoDev/dom-native-pptx/v0.2.0-beta.2/docs/assets/demo-powerpoint.png) |
 
 The matching PowerPoint slide contains native text and shapes rather than a
 full-slide picture. PowerPoint font metrics and its square-corner approximation

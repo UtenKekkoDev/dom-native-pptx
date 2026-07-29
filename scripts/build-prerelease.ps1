@@ -1,11 +1,11 @@
 param(
-  [string]$OutputDir = ".tmp/release/v0.2.0-beta.1"
+  [string]$OutputDir = ".tmp/release/v0.2.0-beta.2"
 )
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$Version = "0.2.0-beta.1"
+$Version = "0.2.0-beta.2"
 $Tag = "v$Version"
 $root = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 $tmpRoot = [System.IO.Path]::GetFullPath((Join-Path $root ".tmp"))
@@ -15,7 +15,7 @@ $workPath = [System.IO.Path]::GetFullPath((Join-Path $root $workRelative))
 $fixture = "examples/10-full-business-deck/slides.html"
 $fixturePath = Join-Path $root $fixture
 $workDeck = Join-Path $workPath "demo.pptx"
-$releaseDeck = Join-Path $outputPath "dom-native-pptx-v0.2.0-beta.1-demo.pptx"
+$releaseDeck = Join-Path $outputPath "dom-native-pptx-v0.2.0-beta.2-demo.pptx"
 $releaseManifest = Join-Path $outputPath "demo.conversion-manifest.json"
 $releaseValidationJson = Join-Path $outputPath "demo.validation.json"
 $releaseValidationHtml = Join-Path $outputPath "demo.validation.html"

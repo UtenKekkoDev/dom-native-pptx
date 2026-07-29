@@ -43,7 +43,7 @@ describe("README Agent prompt contract", () => {
   });
 
   it("states the GitHub beta and npm status truthfully", () => {
-    expect(readme).toContain("v0.2.0-beta.1");
+    expect(readme).toContain("v0.2.0-beta.2");
     expect(readme).toContain("npm package has not been published");
     expect(readme).not.toMatch(/npm package is (live|published)/iu);
   });

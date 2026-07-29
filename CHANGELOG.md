@@ -8,6 +8,15 @@ All notable changes to this project will be documented in this file.
 
 - Nothing yet.
 
+## 0.2.0-beta.2
+
+### Changed
+
+- Added bilingual copyable Agent prompts and refreshed public documentation.
+- Hardened cross-platform public-sync recovery, Git index validation, and
+  repository governance checks.
+- Added reproducible release evidence for the native editable demo deck.
+
 ## 0.2.0-beta.1
 
 ### Added

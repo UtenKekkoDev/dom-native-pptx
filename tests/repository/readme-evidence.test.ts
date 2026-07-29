@@ -9,8 +9,8 @@ const evidencePaths = [
   "docs/assets/demo-powerpoint.png",
 ] as const;
 const evidenceUrls = [
-  "https://raw.githubusercontent.com/UtenKekkoDev/dom-native-pptx/v0.2.0-beta.1/docs/assets/demo-html.png",
-  "https://raw.githubusercontent.com/UtenKekkoDev/dom-native-pptx/v0.2.0-beta.1/docs/assets/demo-powerpoint.png",
+  "https://raw.githubusercontent.com/UtenKekkoDev/dom-native-pptx/v0.2.0-beta.2/docs/assets/demo-html.png",
+  "https://raw.githubusercontent.com/UtenKekkoDev/dom-native-pptx/v0.2.0-beta.2/docs/assets/demo-powerpoint.png",
 ] as const;
 
 interface GeneratedAssetRecord {
