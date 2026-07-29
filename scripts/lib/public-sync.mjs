@@ -1322,6 +1322,13 @@ async function readDestinationIndex(destination) {
   return new Map(records.map((record) => [record.path, record]));
 }
 
+async function logicalIndexHash(destination) {
+  const entries = await runGit(destination, ["ls-files", "-s", "-z"], {
+    env: { GIT_OPTIONAL_LOCKS: "0" },
+  });
+  return sha256Buffer(entries);
+}
+
 async function validateDestinationManagedState(destination, canonicalRoot) {
   const currentPaths = [];
   for (const rootFile of PUBLIC_ROOT_FILES) {
@@ -1369,6 +1376,7 @@ async function pathIdentity(target) {
   const stat = await fs.stat(target, { bigint: true });
   return {
     canonicalPath,
+    ctimeNs: stat.ctimeNs.toString(),
     device: stat.dev.toString(),
     inode: stat.ino.toString(),
   };
@@ -1384,6 +1392,10 @@ function samePathIdentity(left, right) {
     left.device === right.device &&
     left.inode === right.inode
   );
+}
+
+function sameLockIdentity(left, right) {
+  return samePathIdentity(left, right) && left.ctimeNs === right.ctimeNs;
 }
 
 function assertStablePathIdentity(identity, label) {
@@ -1546,7 +1558,7 @@ async function acquireDestinationLock(destination, durability) {
 async function assertLockIdentity(lock) {
   try {
     const current = await pathIdentity(lock.path);
-    if (!samePathIdentity(current, lock.identity)) {
+    if (!sameLockIdentity(current, lock.identity)) {
       throw new Error("lock identity changed");
     }
   } catch (error) {
@@ -2040,7 +2052,7 @@ async function loadRecoveryWorkspace(recoveryPath) {
   const terminalPhase = TERMINAL_RECOVERY_PHASES.has(journal.phase);
   const lockIdentity = await pathIdentity(journal.lockPath).catch(() => null);
   if (
-    (lockIdentity && !samePathIdentity(lockIdentity, journal.lockIdentity)) ||
+    (lockIdentity && !sameLockIdentity(lockIdentity, journal.lockIdentity)) ||
     (!lockIdentity && !terminalPhase)
   ) {
     throw new PublicSyncError(
@@ -2147,7 +2159,7 @@ async function assertRecoveryIdentity(
     return;
   }
   const currentLock = await pathIdentity(lock.path).catch(() => null);
-  if (!currentLock || !samePathIdentity(currentLock, lock.identity)) {
+  if (!currentLock || !sameLockIdentity(currentLock, lock.identity)) {
     throw new PublicSyncError(
       "RECOVERY_LOCK_CHANGED",
       "Recovery lock is missing or changed identity",
@@ -2279,6 +2291,7 @@ async function assertTerminalRecoveryState({
   lock,
   files,
   indexHash,
+  indexLogicalHash,
   indexMode,
 }) {
   await assertRecoveryIdentity(snapshot, lock, true);
@@ -2292,10 +2305,12 @@ async function assertTerminalRecoveryState({
     );
   }
   const currentIndex = await readIndexFileSnapshot(snapshot.indexPath);
-  if (
-    sha256Buffer(currentIndex.bytes) !== indexHash ||
-    currentIndex.mode !== indexMode
-  ) {
+  const rawIndexMatches = sha256Buffer(currentIndex.bytes) === indexHash;
+  const logicalIndexMatches =
+    rawIndexMatches ||
+    (typeof indexLogicalHash === "string" &&
+      (await logicalIndexHash(snapshot.root)) === indexLogicalHash);
+  if (!logicalIndexMatches || currentIndex.mode !== indexMode) {
     throw new PublicSyncError(
       "RECOVERY_STATE_CHANGED",
       "Recovered destination index changed",
@@ -2325,9 +2340,9 @@ const FINALIZED_TOMBSTONE_KEYS = [
   "version",
   "workspaceIdentity",
 ];
-const IDENTITY_KEYS = ["canonicalPath", "device", "inode"];
+const IDENTITY_KEYS = ["canonicalPath", "ctimeNs", "device", "inode"];
 const TERMINAL_FILE_KEYS = ["mode", "path", "sha256"];
-const TERMINAL_INDEX_KEYS = ["mode", "sha256"];
+const TERMINAL_INDEX_KEYS = ["logicalSha256", "mode", "sha256"];
 const DURABILITY_KEYS = ["directoryFsync", "recoveryProtocol", "stagedFiles"];
 const DIRECTORY_SYNC_CODES = new Set(["EINVAL", "EISDIR", "ENOTSUP", "EPERM"]);
 
@@ -2352,6 +2367,7 @@ function hasStableIdentitySchema(identity) {
   return (
     hasExactKeys(identity, IDENTITY_KEYS) &&
     typeof identity.canonicalPath === "string" &&
+    typeof identity.ctimeNs === "string" &&
     typeof identity.device === "string" &&
     typeof identity.inode === "string" &&
     identity.inode !== "0"
@@ -2382,6 +2398,7 @@ function assertFinalizedTombstoneSchema(tombstone) {
       !hasStableIdentitySchema(tombstone.destinationIdentity.git) ||
       !hasExactKeys(tombstone.terminalIndex, TERMINAL_INDEX_KEYS) ||
       !/^[0-9a-f]{64}$/u.test(tombstone.terminalIndex.sha256) ||
+      !/^[0-9a-f]{64}$/u.test(tombstone.terminalIndex.logicalSha256) ||
       !Number.isInteger(tombstone.terminalIndex.mode) ||
       tombstone.terminalIndex.mode < 0 ||
       tombstone.terminalIndex.mode > 0o777 ||
@@ -2497,6 +2514,7 @@ function bigintStatMode(stat) {
 function identityFromBigintStat(canonicalPath, stat) {
   return {
     canonicalPath,
+    ctimeNs: stat.ctimeNs.toString(),
     device: stat.dev.toString(),
     inode: stat.ino.toString(),
   };
@@ -2781,7 +2799,7 @@ async function assertFinalizedLockAuthority(state) {
     state.lock = null;
     return false;
   }
-  if (!samePathIdentity(current, state.tombstone.lockIdentity)) {
+  if (!sameLockIdentity(current, state.tombstone.lockIdentity)) {
     throw new PublicSyncError(
       "RECOVERY_LOCK_CHANGED",
       "Finalized recovery lock changed identity",
@@ -2803,6 +2821,7 @@ async function assertFinalizedTerminalAuthority(state) {
     lock: state.lock,
     files: state.files,
     indexHash: state.tombstone.terminalIndex.sha256,
+    indexLogicalHash: state.tombstone.terminalIndex.logicalSha256,
     indexMode: state.tombstone.terminalIndex.mode,
   });
   await assertFinalizedTombstoneAuthority(state);
@@ -2970,7 +2989,7 @@ async function finishFinalizedTombstone(
 }
 
 async function createFinalizedTombstoneState(
-  { recovery, snapshot, lock, files, indexHash, indexMode },
+  { recovery, snapshot, lock, files, indexHash, indexLogicalHash, indexMode },
   outcome,
 ) {
   const recoveryPath = recovery.workspace;
@@ -3001,7 +3020,11 @@ async function createFinalizedTombstoneState(
     },
     lockIdentity: recovery.journal.lockIdentity,
     terminalFiles: serializeFileSnapshot(files),
-    terminalIndex: { sha256: indexHash, mode: indexMode },
+    terminalIndex: {
+      logicalSha256: indexLogicalHash,
+      mode: indexMode,
+      sha256: indexHash,
+    },
     lockState: "held",
     cleanupState: "pending",
     durability: durabilitySummary(recovery.durability),
@@ -3133,6 +3156,7 @@ async function finalizeRecoveryState(
     indexHash: committed
       ? updatedIndex.sha256
       : recovery.journal.originalIndex.sha256,
+    indexLogicalHash: await logicalIndexHash(snapshot.root),
     indexMode: committed
       ? updatedIndex.mode
       : recovery.journal.originalIndex.mode,
@@ -3172,6 +3196,7 @@ async function finalizeRecoveryState(
       lock,
       files: terminal.files,
       indexHash: terminal.indexHash,
+      indexLogicalHash: terminal.indexLogicalHash,
       indexMode: terminal.indexMode,
     },
     committed ? "committed" : "rolled-back",

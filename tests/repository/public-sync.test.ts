@@ -1740,6 +1740,7 @@ describe("committed public tree synchronization", () => {
         }),
       ]),
       terminalIndex: expect.objectContaining({
+        logicalSha256: expect.stringMatching(/^[0-9a-f]{64}$/),
         sha256: expect.stringMatching(/^[0-9a-f]{64}$/),
         mode: expect.any(Number),
       }),
