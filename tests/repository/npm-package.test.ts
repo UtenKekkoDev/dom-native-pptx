@@ -72,7 +72,7 @@ describe("npm package contract", () => {
       publishConfig?: { access?: string; provenance?: boolean };
     };
 
-    expect(pkg.version).toBe("0.2.0-beta.1");
+    expect(pkg.version).toBe("0.2.0-beta.2");
     expect(pkg.private).not.toBe(true);
     expect(pkg.license).toBe("MIT");
     expect(pkg.author).toBe("Yuxuan Sun");
@@ -121,8 +121,8 @@ describe("npm package contract", () => {
     );
     expect(packageFiles).toEqual(expect.arrayContaining(relativeTargets));
     expect(imageTargets).toEqual([
-      "https://raw.githubusercontent.com/UtenKekkoDev/dom-native-pptx/v0.2.0-beta.1/docs/assets/demo-html.png",
-      "https://raw.githubusercontent.com/UtenKekkoDev/dom-native-pptx/v0.2.0-beta.1/docs/assets/demo-powerpoint.png",
+      "https://raw.githubusercontent.com/UtenKekkoDev/dom-native-pptx/v0.2.0-beta.2/docs/assets/demo-html.png",
+      "https://raw.githubusercontent.com/UtenKekkoDev/dom-native-pptx/v0.2.0-beta.2/docs/assets/demo-powerpoint.png",
     ]);
     expect(packageFiles.some((file) => file.startsWith("docs/assets/"))).toBe(
       false,

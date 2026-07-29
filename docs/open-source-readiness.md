@@ -153,7 +153,7 @@ URLs: the CLI fails closed and does not echo them.
 
 - Confirm the npm name is still available immediately before publication.
 - Configure npm trusted publishing/OIDC for the GitHub repository.
-- Publish `0.2.0-beta.1` with the `beta` dist-tag before any stable release.
+- Publish `0.2.0-beta.2` with the `beta` dist-tag before any stable release.
 - Install the resulting tarball in a clean consumer project and test both the
   CLI and public library API.
 

@@ -1,6 +1,6 @@
 {
   "name": "dom-native-pptx",
-  "version": "0.2.0-beta.1",
+  "version": "0.2.0-beta.2",
   "description": "Fail-closed HTML DOM to native editable PowerPoint converter and Agent Skill.",
   "private": false,
   "type": "module",
