@@ -61,7 +61,13 @@ describe("browser security policy", () => {
       const parent = path.resolve(".tmp/tests/security-policy-case-sensitive");
       const root = path.join(parent, "Deck");
       const outside = path.join(parent, "deck", "secret.png");
+      await fs.rm(parent, { recursive: true, force: true });
       await fs.mkdir(root, { recursive: true });
+      const lowerCaseAliasExists = await fs
+        .realpath(path.join(parent, "deck"))
+        .then(() => true)
+        .catch(() => false);
+      if (lowerCaseAliasExists) return;
       await fs.mkdir(path.dirname(outside), { recursive: true });
       await fs.writeFile(path.join(root, "slides.html"), "<html></html>");
       await fs.writeFile(outside, "secret");
