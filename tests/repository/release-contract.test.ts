@@ -17,7 +17,7 @@ describe("GitHub prerelease contract", () => {
 
     expect(workflow).toMatch(/^on:\s*\n\s+workflow_dispatch:\s*$/mu);
     expect(workflow).not.toMatch(/^\s+(push|pull_request|schedule):/mu);
-    expect(workflow).toMatch(/permissions:\r?\n  contents: read/u);
+    expect(workflow).toMatch(/permissions:\r?\n {2}contents: read/u);
     expect(workflow).toContain("actions/checkout@v7");
     expect(workflow).toContain("actions/setup-node@v7");
     expect(workflow).toContain("actions/upload-artifact@v7");
