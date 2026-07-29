@@ -26,17 +26,16 @@ export function pxRectToInches(
   canvas: { width: number; height: number },
 ): RectInches {
   return {
-    x: round(rect.x / canvas.width * PPTX_SLIDE.width),
-    y: round(rect.y / canvas.height * PPTX_SLIDE.height),
-    width: round(rect.width / canvas.width * PPTX_SLIDE.width),
-    height: round(rect.height / canvas.height * PPTX_SLIDE.height),
+    x: round((rect.x / canvas.width) * PPTX_SLIDE.width),
+    y: round((rect.y / canvas.height) * PPTX_SLIDE.height),
+    width: round((rect.width / canvas.width) * PPTX_SLIDE.width),
+    height: round((rect.height / canvas.height) * PPTX_SLIDE.height),
   };
 }
 
 export function cssPixelsToPoints(value: string, fallback = 0): number {
   const pixels = Number.parseFloat(value);
-  const pointsPerPixel =
-    PPTX_SLIDE.width * 72 / HTML_CANVAS.width;
+  const pointsPerPixel = (PPTX_SLIDE.width * 72) / HTML_CANVAS.width;
   return Number.isFinite(pixels)
     ? Number((pixels * pointsPerPixel).toFixed(2))
     : fallback;

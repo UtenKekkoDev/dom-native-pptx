@@ -12,11 +12,24 @@ export type TextRole =
   | "source";
 
 export type RasterRole =
-  | "logo"
-  | "brand-lockup"
-  | "photo"
-  | "illustration"
-  | "decorative-composite";
+  "logo" | "brand-lockup" | "photo" | "illustration" | "decorative-composite";
+
+export type SecurityMode = "safe" | "trusted";
+
+export interface SecurityPolicyErrorDetails {
+  code:
+    | "SECURITY_REMOTE_RESOURCE_BLOCKED"
+    | "SECURITY_LOCAL_PATH_ESCAPE"
+    | "SECURITY_IFRAME_BLOCKED"
+    | "SECURITY_DATA_URL_BLOCKED"
+    | "SECURITY_TRUSTED_MODE_REQUIRED"
+    | "SECURITY_RESOURCE_TIMEOUT";
+  resourceType: string;
+  resourceLocation: string;
+  inputPath: string;
+  securityMode: SecurityMode;
+  suggestedRepair: string;
+}
 
 export interface RectPx {
   x: number;
@@ -46,10 +59,7 @@ export interface RasterDecision {
 }
 
 export type VisualEffectDisposition =
-  | "native"
-  | "approximation"
-  | "requires-raster"
-  | "reject";
+  "native" | "approximation" | "requires-raster" | "reject";
 
 export interface VisualEffectFinding {
   property: string;
@@ -58,11 +68,7 @@ export interface VisualEffectFinding {
 }
 
 export type PptxOutputType =
-  | "native-text"
-  | "native-shape"
-  | "native-table"
-  | "native-chart"
-  | "image";
+  "native-text" | "native-shape" | "native-table" | "native-chart" | "image";
 
 export interface ConversionRecord {
   slide: number;
@@ -94,7 +100,7 @@ export class ConversionPolicyError extends Error {
   constructor(details: ConversionErrorDetails) {
     super(
       `${details.reason}; slide=${details.slide}; selector=${details.selector}; ` +
-      `text="${details.textPreview}"`,
+        `text="${details.textPreview}"`,
     );
     this.name = "ConversionPolicyError";
     this.details = details;

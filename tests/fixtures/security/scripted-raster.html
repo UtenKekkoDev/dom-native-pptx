@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+  <body style="margin: 0">
+    <section
+      class="pptx-slide"
+      style="position: relative; width: 1920px; height: 1080px"
+    >
+      <div
+        id="scripted-raster"
+        data-pptx-raster="allowed"
+        data-pptx-raster-role="decorative-composite"
+        style="
+          position: absolute;
+          left: 100px;
+          top: 100px;
+          width: 200px;
+          height: 200px;
+          background: rgb(255, 0, 0);
+        "
+      ></div>
+    </section>
+    <script>
+      document.querySelector("#scripted-raster").style.background =
+        "rgb(0, 255, 0)";
+    </script>
+  </body>
+</html>

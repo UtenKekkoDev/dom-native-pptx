@@ -5,10 +5,7 @@ The converter denies raster output by default.
 ## Approved declaration
 
 ```html
-<div
-  data-pptx-raster="allowed"
-  data-pptx-raster-role="photo"
-></div>
+<div data-pptx-raster="allowed" data-pptx-raster-role="photo"></div>
 ```
 
 Approved roles:

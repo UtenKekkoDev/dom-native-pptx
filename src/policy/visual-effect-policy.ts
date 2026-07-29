@@ -29,7 +29,8 @@ const RULES: readonly VisualEffectRule[] = [
     property: "box-shadow",
     inactive: NONE,
     disposition: "approximation",
-    message: "CSS box shadows are not reproduced by the native shape converter.",
+    message:
+      "CSS box shadows are not reproduced by the native shape converter.",
   },
   {
     styleKey: "textShadow",
@@ -43,7 +44,8 @@ const RULES: readonly VisualEffectRule[] = [
     property: "transform",
     inactive: NONE,
     disposition: "approximation",
-    message: "Complex CSS transforms are flattened to the measured axis-aligned bounds.",
+    message:
+      "Complex CSS transforms are flattened to the measured axis-aligned bounds.",
   },
   {
     styleKey: "filter",

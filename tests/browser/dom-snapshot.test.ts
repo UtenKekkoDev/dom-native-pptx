@@ -27,8 +27,9 @@ describe("DOM snapshot", () => {
     expect(title?.style.fontFamily).toContain("Microsoft YaHei");
     expect(title?.style.fontSize).toBe("64px");
     expect(title?.style.color).toBe("rgb(32, 21, 42)");
-    expect(Number.parseFloat(title?.style.pptxTextNaturalWidth ?? "0"))
-      .toBeGreaterThan(250);
+    expect(
+      Number.parseFloat(title?.style.pptxTextNaturalWidth ?? "0"),
+    ).toBeGreaterThan(250);
   });
 
   it("rejects a source that has no slide-safe canvas", async () => {
@@ -53,5 +54,34 @@ describe("DOM snapshot", () => {
     );
 
     expect(raster?.selector).toBe(":scope > div:nth-of-type(2)");
+  });
+
+  it("does not execute source scripts by default", async () => {
+    const slides = await snapshotDeck(
+      path.resolve("tests/fixtures/security/scripted-slide.html"),
+    );
+
+    expect(slides[0].find((item) => item.id === "mode")?.text).toBe("SAFE");
+  });
+
+  it("executes source scripts when trusted mode is explicit", async () => {
+    const slides = await snapshotDeck(
+      path.resolve("tests/fixtures/security/scripted-slide.html"),
+      { securityMode: "trusted" },
+    );
+
+    expect(slides[0].find((item) => item.id === "mode")?.text).toBe("TRUSTED");
+  });
+
+  it("supports the deprecated string selector argument", async () => {
+    const slides = await snapshotDeck(
+      path.resolve("tests/fixtures/legacy-custom-selector.html"),
+      ".legacy-slide",
+    );
+
+    expect(slides).toHaveLength(1);
+    expect(slides[0].find((item) => item.id === "legacy-title")?.text).toBe(
+      "Legacy selector",
+    );
   });
 });

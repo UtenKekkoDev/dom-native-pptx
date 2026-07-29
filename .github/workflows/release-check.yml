@@ -1,0 +1,37 @@
+name: Release Check
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run audit:licenses
+      - run: npm run test:run
+      - run: npm run test:coverage
+      - run: npm run test:package
+      - name: Record npm dry-run package report
+        run: |
+          mkdir -p .tmp/release-check
+          npm pack --dry-run --json --ignore-scripts > .tmp/release-check/npm-pack-dry-run.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-check-${{ github.sha }}
+          path: .tmp/release-check/
+          if-no-files-found: error
+          retention-days: 14

@@ -1,7 +1,4 @@
-import type {
-  DomNodeSnapshot,
-  RasterDecision,
-} from "../types.js";
+import type { DomNodeSnapshot, RasterDecision } from "../types.js";
 import type { ConversionManifest } from "../pipeline/manifest.js";
 import { HTML_CANVAS, pxRectToInches } from "./unit-converter.js";
 

@@ -2,7 +2,9 @@ import { spawnSync } from "node:child_process";
 
 const npmCli = process.env.npm_execpath;
 if (!npmCli) {
-  throw new Error("npm_execpath is unavailable; run this check through npm run test:package");
+  throw new Error(
+    "npm_execpath is unavailable; run this check through npm run test:package",
+  );
 }
 const result = spawnSync(
   process.execPath,
@@ -12,7 +14,10 @@ const result = spawnSync(
 
 if (result.status !== 0) {
   process.stderr.write(
-    result.stderr || result.stdout || result.error?.message || "npm pack failed\n",
+    result.stderr ||
+      result.stdout ||
+      result.error?.message ||
+      "npm pack failed\n",
   );
   process.exit(result.status ?? 1);
 }
@@ -24,6 +29,8 @@ const required = [
   "README.md",
   "LICENSE",
   "THIRD_PARTY_NOTICES.md",
+  "SECURITY.md",
+  "SOURCE_MAP.md",
   "dist/index.js",
   "dist/index.d.ts",
   "dist/cli.js",
@@ -41,7 +48,7 @@ const forbiddenPrefixes = [
 
 const missing = required.filter((entry) => !files.includes(entry));
 const forbidden = files.filter((entry) =>
-  forbiddenPrefixes.some((prefix) => entry.startsWith(prefix))
+  forbiddenPrefixes.some((prefix) => entry.startsWith(prefix)),
 );
 
 if (missing.length || forbidden.length) {
@@ -54,11 +61,17 @@ if (missing.length || forbidden.length) {
   process.exit(1);
 }
 
-process.stdout.write(JSON.stringify({
-  name: report.name,
-  version: report.version,
-  filename: report.filename,
-  fileCount: files.length,
-  packageSize: report.size,
-  unpackedSize: report.unpackedSize,
-}, null, 2) + "\n");
+process.stdout.write(
+  JSON.stringify(
+    {
+      name: report.name,
+      version: report.version,
+      filename: report.filename,
+      fileCount: files.length,
+      packageSize: report.size,
+      unpackedSize: report.unpackedSize,
+    },
+    null,
+    2,
+  ) + "\n",
+);

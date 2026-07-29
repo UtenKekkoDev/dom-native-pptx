@@ -1,139 +1,591 @@
 <!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<title>DOM Native PPTX complex effects stress fixture</title>
-<style>
-*{box-sizing:border-box}
-html,body{margin:0;background:#171221;font-family:"Microsoft YaHei","Segoe UI",sans-serif}
-.pptx-slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:#f5f1eb;color:#18151f}
-.kicker{position:absolute;left:110px;top:78px;font-size:22px;letter-spacing:5px;color:#6b5a76}
-.title{position:absolute;left:110px;top:125px;width:1250px;height:105px;margin:0;font-size:64px;line-height:1.2;font-weight:750}
-.body{position:absolute;left:110px;top:255px;width:820px;height:90px;margin:0;font-size:28px;line-height:1.55;color:#443a4d}
-.page{position:absolute;right:78px;bottom:52px;width:120px;height:34px;font-size:20px;text-align:right;color:#766b7d}
+  <head>
+    <meta charset="utf-8" />
+    <title>DOM Native PPTX complex effects stress fixture</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        background: #171221;
+        font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+      }
+      .pptx-slide {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #f5f1eb;
+        color: #18151f;
+      }
+      .kicker {
+        position: absolute;
+        left: 110px;
+        top: 78px;
+        font-size: 22px;
+        letter-spacing: 5px;
+        color: #6b5a76;
+      }
+      .title {
+        position: absolute;
+        left: 110px;
+        top: 125px;
+        width: 1250px;
+        height: 105px;
+        margin: 0;
+        font-size: 64px;
+        line-height: 1.2;
+        font-weight: 750;
+      }
+      .body {
+        position: absolute;
+        left: 110px;
+        top: 255px;
+        width: 820px;
+        height: 90px;
+        margin: 0;
+        font-size: 28px;
+        line-height: 1.55;
+        color: #443a4d;
+      }
+      .page {
+        position: absolute;
+        right: 78px;
+        bottom: 52px;
+        width: 120px;
+        height: 34px;
+        font-size: 20px;
+        text-align: right;
+        color: #766b7d;
+      }
 
-#gradient-card{position:absolute;left:110px;top:390px;width:760px;height:480px;border-radius:48px;background-image:linear-gradient(135deg,#5927d9 0%,#b14cff 48%,#ff9e66 100%);filter:drop-shadow(0 30px 34px rgba(59,26,92,.34));box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
-#gradient-card::before{content:"";position:absolute;inset:34px;border:2px solid rgba(255,255,255,.55);border-radius:34px}
-#gradient-orbit{position:absolute;left:1030px;top:360px;width:510px;height:510px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 7%,#d3b9ff 8% 20%,#6b37da 45%,#211338 75%);box-shadow:0 0 70px rgba(117,67,225,.6)}
+      #gradient-card {
+        position: absolute;
+        left: 110px;
+        top: 390px;
+        width: 760px;
+        height: 480px;
+        border-radius: 48px;
+        background-image: linear-gradient(
+          135deg,
+          #5927d9 0%,
+          #b14cff 48%,
+          #ff9e66 100%
+        );
+        filter: drop-shadow(0 30px 34px rgba(59, 26, 92, 0.34));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      }
+      #gradient-card::before {
+        content: "";
+        position: absolute;
+        inset: 34px;
+        border: 2px solid rgba(255, 255, 255, 0.55);
+        border-radius: 34px;
+      }
+      #gradient-orbit {
+        position: absolute;
+        left: 1030px;
+        top: 360px;
+        width: 510px;
+        height: 510px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 35% 30%,
+          #fff 0 7%,
+          #d3b9ff 8% 20%,
+          #6b37da 45%,
+          #211338 75%
+        );
+        box-shadow: 0 0 70px rgba(117, 67, 225, 0.6);
+      }
 
-.round-card{position:absolute;top:400px;width:470px;height:430px;padding:52px;border:6px solid #5f35c8;background:#fff}
-#round-a{left:110px;border-radius:70px 16px 70px 16px}
-#round-b{left:725px;border-color:#ee5c4d #e8aa32 #5f35c8 #17121d;border-width:10px 18px 28px 6px;border-radius:110px}
-#round-c{left:1340px;border-radius:50%;width:430px;height:430px;background:#20152c;border-color:#d7b9ff;color:white}
-.round-card h2{font-size:42px;margin:0 0 28px}.round-card p{font-size:26px;line-height:1.45;margin:0}
+      .round-card {
+        position: absolute;
+        top: 400px;
+        width: 470px;
+        height: 430px;
+        padding: 52px;
+        border: 6px solid #5f35c8;
+        background: #fff;
+      }
+      #round-a {
+        left: 110px;
+        border-radius: 70px 16px 70px 16px;
+      }
+      #round-b {
+        left: 725px;
+        border-color: #ee5c4d #e8aa32 #5f35c8 #17121d;
+        border-width: 10px 18px 28px 6px;
+        border-radius: 110px;
+      }
+      #round-c {
+        left: 1340px;
+        border-radius: 50%;
+        width: 430px;
+        height: 430px;
+        background: #20152c;
+        border-color: #d7b9ff;
+        color: white;
+      }
+      .round-card h2 {
+        font-size: 42px;
+        margin: 0 0 28px;
+      }
+      .round-card p {
+        font-size: 26px;
+        line-height: 1.45;
+        margin: 0;
+      }
 
-#transform-block{position:absolute;left:185px;top:430px;width:650px;height:360px;transform:rotate(-8deg) scale(1.04);transform-origin:center;background:#f04d3f;box-shadow:24px 28px 0 #17131b}
-#clipped-photo{position:absolute;left:1020px;top:370px;width:650px;height:470px;background:linear-gradient(115deg,#15111d,#6f39dc 52%,#f0b53e);clip-path:polygon(0 13%,72% 0,100% 38%,86% 100%,16% 92%);filter:saturate(1.35) contrast(1.08)}
+      #transform-block {
+        position: absolute;
+        left: 185px;
+        top: 430px;
+        width: 650px;
+        height: 360px;
+        transform: rotate(-8deg) scale(1.04);
+        transform-origin: center;
+        background: #f04d3f;
+        box-shadow: 24px 28px 0 #17131b;
+      }
+      #clipped-photo {
+        position: absolute;
+        left: 1020px;
+        top: 370px;
+        width: 650px;
+        height: 470px;
+        background: linear-gradient(115deg, #15111d, #6f39dc 52%, #f0b53e);
+        clip-path: polygon(0 13%, 72% 0, 100% 38%, 86% 100%, 16% 92%);
+        filter: saturate(1.35) contrast(1.08);
+      }
 
-#stack-image{position:absolute;left:500px;top:330px;width:920px;height:540px;z-index:10;border-radius:38px;background:linear-gradient(145deg,#181321,#4e1f88 42%,#ec4c74);box-shadow:0 38px 70px rgba(24,14,38,.38)}
-#stack-caption{position:absolute;left:610px;top:700px;width:700px;height:96px;z-index:20;margin:0;padding:24px 36px;background:rgba(255,255,255,.92);font-size:30px;font-weight:700;text-align:center}
-#stack-underlay{position:absolute;left:400px;top:270px;width:1120px;height:660px;z-index:0;background:#e6c34b;transform:rotate(3deg)}
+      #stack-image {
+        position: absolute;
+        left: 500px;
+        top: 330px;
+        width: 920px;
+        height: 540px;
+        z-index: 10;
+        border-radius: 38px;
+        background: linear-gradient(145deg, #181321, #4e1f88 42%, #ec4c74);
+        box-shadow: 0 38px 70px rgba(24, 14, 38, 0.38);
+      }
+      #stack-caption {
+        position: absolute;
+        left: 610px;
+        top: 700px;
+        width: 700px;
+        height: 96px;
+        z-index: 20;
+        margin: 0;
+        padding: 24px 36px;
+        background: rgba(255, 255, 255, 0.92);
+        font-size: 30px;
+        font-weight: 700;
+        text-align: center;
+      }
+      #stack-underlay {
+        position: absolute;
+        left: 400px;
+        top: 270px;
+        width: 1120px;
+        height: 660px;
+        z-index: 0;
+        background: #e6c34b;
+        transform: rotate(3deg);
+      }
 
-#svg-art{position:absolute;left:180px;top:390px;width:660px;height:470px;filter:drop-shadow(0 28px 26px rgba(38,18,75,.3))}
-#svg-copy{position:absolute;left:1040px;top:440px;width:650px;height:280px;margin:0;font-size:46px;line-height:1.45;font-weight:700}
+      #svg-art {
+        position: absolute;
+        left: 180px;
+        top: 390px;
+        width: 660px;
+        height: 470px;
+        filter: drop-shadow(0 28px 26px rgba(38, 18, 75, 0.3));
+      }
+      #svg-copy {
+        position: absolute;
+        left: 1040px;
+        top: 440px;
+        width: 650px;
+        height: 280px;
+        margin: 0;
+        font-size: 46px;
+        line-height: 1.45;
+        font-weight: 700;
+      }
 
-#mixed-headline{position:absolute;left:110px;top:315px;width:1500px;height:130px;font-family:"Segoe UI","Microsoft YaHei",sans-serif;font-size:76px;line-height:1.18;letter-spacing:-2px;font-weight:800;text-shadow:0 8px 30px rgba(92,42,184,.3)}
-#mixed-columns{position:absolute;left:110px;top:520px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:42px;width:1700px}
-.language{min-height:250px;padding:34px 38px;background:#fff;border-top:10px solid #6843d5;font-size:28px;line-height:1.55}
+      #mixed-headline {
+        position: absolute;
+        left: 110px;
+        top: 315px;
+        width: 1500px;
+        height: 130px;
+        font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+        font-size: 76px;
+        line-height: 1.18;
+        letter-spacing: -2px;
+        font-weight: 800;
+        text-shadow: 0 8px 30px rgba(92, 42, 184, 0.3);
+      }
+      #mixed-columns {
+        position: absolute;
+        left: 110px;
+        top: 520px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 42px;
+        width: 1700px;
+      }
+      .language {
+        min-height: 250px;
+        padding: 34px 38px;
+        background: #fff;
+        border-top: 10px solid #6843d5;
+        font-size: 28px;
+        line-height: 1.55;
+      }
 
-#data-table{position:absolute;left:110px;top:375px;width:760px;border-collapse:collapse;background:#fff;font-size:28px}
-#data-table th,#data-table td{padding:24px 28px;border:2px solid #d9cfdf;text-align:left}
-#data-table th{background:#2c173d;color:#fff}
-#chart{position:absolute;left:1000px;top:360px;width:750px;height:460px;padding:54px 64px 42px;background:#fff;border-radius:32px;box-shadow:0 24px 55px rgba(35,17,54,.18)}
-.chart-bars{display:flex;align-items:flex-end;justify-content:space-around;height:310px;border-bottom:3px solid #8f8497}
-.chart-bar{position:relative;width:112px;background:#6d3ed2;border-radius:12px 12px 0 0}
-.chart-bar::before{content:attr(data-value);position:absolute;left:0;right:0;top:-42px;text-align:center;font-size:24px;font-weight:700}
-.chart-bar::after{content:attr(data-label);position:absolute;left:0;right:0;bottom:-42px;text-align:center;font-size:22px}
+      #data-table {
+        position: absolute;
+        left: 110px;
+        top: 375px;
+        width: 760px;
+        border-collapse: collapse;
+        background: #fff;
+        font-size: 28px;
+      }
+      #data-table th,
+      #data-table td {
+        padding: 24px 28px;
+        border: 2px solid #d9cfdf;
+        text-align: left;
+      }
+      #data-table th {
+        background: #2c173d;
+        color: #fff;
+      }
+      #chart {
+        position: absolute;
+        left: 1000px;
+        top: 360px;
+        width: 750px;
+        height: 460px;
+        padding: 54px 64px 42px;
+        background: #fff;
+        border-radius: 32px;
+        box-shadow: 0 24px 55px rgba(35, 17, 54, 0.18);
+      }
+      .chart-bars {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        height: 310px;
+        border-bottom: 3px solid #8f8497;
+      }
+      .chart-bar {
+        position: relative;
+        width: 112px;
+        background: #6d3ed2;
+        border-radius: 12px 12px 0 0;
+      }
+      .chart-bar::before {
+        content: attr(data-value);
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: -42px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: 700;
+      }
+      .chart-bar::after {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -42px;
+        text-align: center;
+        font-size: 22px;
+      }
 
-#authorized-composite{position:absolute;left:190px;top:350px;width:720px;height:520px;border-radius:70px;background:conic-gradient(from 35deg,#fdc84b,#ef4c68,#723bd9,#3ed2c4,#fdc84b);filter:blur(.2px) drop-shadow(0 34px 38px rgba(46,17,79,.38));overflow:hidden}
-#authorized-composite::before,#authorized-composite::after{content:"";position:absolute;border-radius:50%;mix-blend-mode:screen}
-#authorized-composite::before{width:430px;height:430px;left:-90px;top:-120px;background:rgba(255,255,255,.45)}
-#authorized-composite::after{width:390px;height:390px;right:-70px;bottom:-140px;background:rgba(29,17,53,.7)}
-#authorized-copy{position:absolute;left:1050px;top:420px;width:650px;height:280px;margin:0;font-size:48px;line-height:1.45;font-weight:750}
-</style>
-</head>
-<body>
+      #authorized-composite {
+        position: absolute;
+        left: 190px;
+        top: 350px;
+        width: 720px;
+        height: 520px;
+        border-radius: 70px;
+        background: conic-gradient(
+          from 35deg,
+          #fdc84b,
+          #ef4c68,
+          #723bd9,
+          #3ed2c4,
+          #fdc84b
+        );
+        filter: blur(0.2px) drop-shadow(0 34px 38px rgba(46, 17, 79, 0.38));
+        overflow: hidden;
+      }
+      #authorized-composite::before,
+      #authorized-composite::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        mix-blend-mode: screen;
+      }
+      #authorized-composite::before {
+        width: 430px;
+        height: 430px;
+        left: -90px;
+        top: -120px;
+        background: rgba(255, 255, 255, 0.45);
+      }
+      #authorized-composite::after {
+        width: 390px;
+        height: 390px;
+        right: -70px;
+        bottom: -140px;
+        background: rgba(29, 17, 53, 0.7);
+      }
+      #authorized-copy {
+        position: absolute;
+        left: 1050px;
+        top: 420px;
+        width: 650px;
+        height: 280px;
+        margin: 0;
+        font-size: 48px;
+        line-height: 1.45;
+        font-weight: 750;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="pptx-slide" id="gradient-shadow">
+      <div class="kicker">01 · COMPLEX VISUAL BASELINE</div>
+      <h1 class="title" id="gradient-title" data-pptx-text-role="title">
+        Gradient stays visual; title stays editable
+      </h1>
+      <p class="body" data-pptx-text-role="body">
+        测试渐变、内阴影、外发光和伪元素装饰的识别方式。
+      </p>
+      <div
+        id="gradient-card"
+        data-pptx-raster="allowed"
+        data-pptx-raster-role="decorative-composite"
+      ></div>
+      <div
+        id="gradient-orbit"
+        data-pptx-raster="allowed"
+        data-pptx-raster-role="illustration"
+      ></div>
+      <div class="page" data-pptx-text-role="page-number">01 / 08</div>
+    </section>
 
-<section class="pptx-slide" id="gradient-shadow">
-  <div class="kicker">01 · COMPLEX VISUAL BASELINE</div>
-  <h1 class="title" id="gradient-title" data-pptx-text-role="title">Gradient stays visual; title stays editable</h1>
-  <p class="body" data-pptx-text-role="body">测试渐变、内阴影、外发光和伪元素装饰的识别方式。</p>
-  <div id="gradient-card" data-pptx-raster="allowed" data-pptx-raster-role="decorative-composite"></div><div id="gradient-orbit" data-pptx-raster="allowed" data-pptx-raster-role="illustration"></div>
-  <div class="page" data-pptx-text-role="page-number">01 / 08</div>
-</section>
+    <section class="pptx-slide" id="rounded-borders">
+      <div class="kicker">02 · SHAPES</div>
+      <h1 class="title" data-pptx-text-role="title">
+        Rounded corners and asymmetric borders
+      </h1>
+      <p class="body" data-pptx-text-role="body">
+        测试圆角矩形、非对称边框以及正圆映射。
+      </p>
+      <div class="round-card" id="round-a">
+        <h2>Asymmetric</h2>
+        <p>Editable native text must not join the visual raster.</p>
+      </div>
+      <div class="round-card" id="round-b">
+        <h2>Four sides</h2>
+        <p>Each border side intentionally uses a different width and color.</p>
+      </div>
+      <div class="round-card" id="round-c">
+        <h2>Circle</h2>
+        <p>Expected native ellipse.</p>
+      </div>
+      <div class="page" data-pptx-text-role="page-number">02 / 08</div>
+    </section>
 
-<section class="pptx-slide" id="rounded-borders">
-  <div class="kicker">02 · SHAPES</div>
-  <h1 class="title" data-pptx-text-role="title">Rounded corners and asymmetric borders</h1>
-  <p class="body" data-pptx-text-role="body">测试圆角矩形、非对称边框以及正圆映射。</p>
-  <div class="round-card" id="round-a"><h2>Asymmetric</h2><p>Editable native text must not join the visual raster.</p></div>
-  <div class="round-card" id="round-b"><h2>Four sides</h2><p>Each border side intentionally uses a different width and color.</p></div>
-  <div class="round-card" id="round-c"><h2>Circle</h2><p>Expected native ellipse.</p></div>
-  <div class="page" data-pptx-text-role="page-number">02 / 08</div>
-</section>
+    <section class="pptx-slide" id="transform-clip">
+      <div class="kicker">03 · TRANSFORM & CLIP</div>
+      <h1 class="title" data-pptx-text-role="title">
+        Transforms cannot silently disappear
+      </h1>
+      <p class="body" data-pptx-text-role="body">
+        旋转、缩放、裁切和滤镜必须被支持、近似或明确警告。
+      </p>
+      <div id="transform-block"></div>
+      <div
+        id="clipped-photo"
+        data-pptx-raster="allowed"
+        data-pptx-raster-role="illustration"
+      ></div>
+      <div class="page" data-pptx-text-role="page-number">03 / 08</div>
+    </section>
 
-<section class="pptx-slide" id="transform-clip">
-  <div class="kicker">03 · TRANSFORM & CLIP</div>
-  <h1 class="title" data-pptx-text-role="title">Transforms cannot silently disappear</h1>
-  <p class="body" data-pptx-text-role="body">旋转、缩放、裁切和滤镜必须被支持、近似或明确警告。</p>
-  <div id="transform-block"></div><div id="clipped-photo" data-pptx-raster="allowed" data-pptx-raster-role="illustration"></div>
-  <div class="page" data-pptx-text-role="page-number">03 / 08</div>
-</section>
+    <section class="pptx-slide" id="stacking">
+      <div class="kicker">04 · LAYER ORDER</div>
+      <h1 class="title" data-pptx-text-role="title">
+        Caption must remain above the image
+      </h1>
+      <p class="body" data-pptx-text-role="body">
+        测试显式 z-index 与 DOM 顺序不一致时的图层顺序。
+      </p>
+      <div id="stack-underlay"></div>
+      <p id="stack-caption" data-pptx-text-role="caption">
+        Native caption · z-index 20
+      </p>
+      <div
+        id="stack-image"
+        data-pptx-raster="allowed"
+        data-pptx-raster-role="illustration"
+      ></div>
+      <div class="page" data-pptx-text-role="page-number">04 / 08</div>
+    </section>
 
-<section class="pptx-slide" id="stacking">
-  <div class="kicker">04 · LAYER ORDER</div>
-  <h1 class="title" data-pptx-text-role="title">Caption must remain above the image</h1>
-  <p class="body" data-pptx-text-role="body">测试显式 z-index 与 DOM 顺序不一致时的图层顺序。</p>
-  <div id="stack-underlay"></div>
-  <p id="stack-caption" data-pptx-text-role="caption">Native caption · z-index 20</p>
-  <div id="stack-image" data-pptx-raster="allowed" data-pptx-raster-role="illustration"></div>
-  <div class="page" data-pptx-text-role="page-number">04 / 08</div>
-</section>
+    <section class="pptx-slide" id="svg-separation">
+      <div class="kicker">05 · SVG</div>
+      <h1 class="title" data-pptx-text-role="title">
+        SVG art and semantic copy stay separate
+      </h1>
+      <p class="body" data-pptx-text-role="body">
+        SVG 只承载视觉图形，正文由独立的原生文本框输出。
+      </p>
+      <svg
+        id="svg-art"
+        viewBox="0 0 660 470"
+        data-pptx-raster="allowed"
+        data-pptx-raster-role="illustration"
+        aria-label="abstract visual illustration"
+      >
+        <defs>
+          <linearGradient id="g" x1="0" x2="1">
+            <stop stop-color="#ef4b65" />
+            <stop offset="1" stop-color="#6738d6" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M70 360 C70 80 280 40 360 210 C430 20 620 120 570 330 C510 440 180 460 70 360Z"
+          fill="url(#g)"
+        />
+        <circle
+          cx="260"
+          cy="220"
+          r="92"
+          fill="none"
+          stroke="#f9d66a"
+          stroke-width="22"
+        />
+      </svg>
+      <p id="svg-copy" data-pptx-text-role="body">
+        The illustration may be rasterized. This sentence must remain editable
+        in PowerPoint.
+      </p>
+      <div class="page" data-pptx-text-role="page-number">05 / 08</div>
+    </section>
 
-<section class="pptx-slide" id="svg-separation">
-  <div class="kicker">05 · SVG</div>
-  <h1 class="title" data-pptx-text-role="title">SVG art and semantic copy stay separate</h1>
-  <p class="body" data-pptx-text-role="body">SVG 只承载视觉图形，正文由独立的原生文本框输出。</p>
-  <svg id="svg-art" viewBox="0 0 660 470" data-pptx-raster="allowed" data-pptx-raster-role="illustration" aria-label="abstract visual illustration">
-    <defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#ef4b65"/><stop offset="1" stop-color="#6738d6"/></linearGradient></defs>
-    <path d="M70 360 C70 80 280 40 360 210 C430 20 620 120 570 330 C510 440 180 460 70 360Z" fill="url(#g)"/>
-    <circle cx="260" cy="220" r="92" fill="none" stroke="#f9d66a" stroke-width="22"/>
-  </svg>
-  <p id="svg-copy" data-pptx-text-role="body">The illustration may be rasterized. This sentence must remain editable in PowerPoint.</p>
-  <div class="page" data-pptx-text-role="page-number">05 / 08</div>
-</section>
+    <section class="pptx-slide" id="mixed-typography">
+      <div class="kicker">06 · TYPOGRAPHY</div>
+      <h1 class="title" data-pptx-text-role="title">
+        Mixed-language typography stress
+      </h1>
+      <p id="mixed-headline" data-pptx-text-role="subtitle">
+        AI 影视全球化 · Native Type · 2026
+      </p>
+      <div id="mixed-columns">
+        <p class="language" data-pptx-text-role="body">
+          中文正文需要保持行高、字重和自然换行，不能为了相似度被整体截图。
+        </p>
+        <p class="language" data-pptx-text-role="body">
+          English copy needs stable font fallback, letter spacing, and editable
+          line breaks.
+        </p>
+        <p class="language" data-pptx-text-role="body">
+          数字与符号：42.8% · ¥16M · 9:16 · A/B Testing
+        </p>
+      </div>
+      <div class="page" data-pptx-text-role="page-number">06 / 08</div>
+    </section>
 
-<section class="pptx-slide" id="mixed-typography">
-  <div class="kicker">06 · TYPOGRAPHY</div>
-  <h1 class="title" data-pptx-text-role="title">Mixed-language typography stress</h1>
-  <p id="mixed-headline" data-pptx-text-role="subtitle">AI 影视全球化 · Native Type · 2026</p>
-  <div id="mixed-columns">
-    <p class="language" data-pptx-text-role="body">中文正文需要保持行高、字重和自然换行，不能为了相似度被整体截图。</p>
-    <p class="language" data-pptx-text-role="body">English copy needs stable font fallback, letter spacing, and editable line breaks.</p>
-    <p class="language" data-pptx-text-role="body">数字与符号：42.8% · ¥16M · 9:16 · A/B Testing</p>
-  </div>
-  <div class="page" data-pptx-text-role="page-number">06 / 08</div>
-</section>
+    <section class="pptx-slide" id="table-chart-effects">
+      <div class="kicker">07 · NATIVE DATA</div>
+      <h1 class="title" data-pptx-text-role="title">
+        Native data stays editable
+      </h1>
+      <p class="body" data-pptx-text-role="body">
+        数据对象不能因为周围存在渐变或阴影而被栅格化。
+      </p>
+      <table id="data-table">
+        <thead>
+          <tr>
+            <th>Region</th>
+            <th>Growth</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>North America</td>
+            <td>38%</td>
+          </tr>
+          <tr>
+            <td>APAC</td>
+            <td>52%</td>
+          </tr>
+          <tr>
+            <td>Europe</td>
+            <td>31%</td>
+          </tr>
+        </tbody>
+      </table>
+      <div
+        id="chart"
+        data-pptx-chart-config='{"type":"column","data":[{"name":"Growth","labels":["NA","APAC","EU"],"values":[38,52,31]}],"showLegend":false,"showValue":true}'
+      >
+        <div class="chart-bars">
+          <div
+            class="chart-bar"
+            style="height: 190px"
+            data-value="38%"
+            data-label="NA"
+          ></div>
+          <div
+            class="chart-bar"
+            style="height: 260px"
+            data-value="52%"
+            data-label="APAC"
+          ></div>
+          <div
+            class="chart-bar"
+            style="height: 155px"
+            data-value="31%"
+            data-label="EU"
+          ></div>
+        </div>
+      </div>
+      <div class="page" data-pptx-text-role="page-number">07 / 08</div>
+    </section>
 
-<section class="pptx-slide" id="table-chart-effects">
-  <div class="kicker">07 · NATIVE DATA</div>
-  <h1 class="title" data-pptx-text-role="title">Tables and charts stay editable beside effects</h1>
-  <p class="body" data-pptx-text-role="body">数据对象不能因为周围存在渐变或阴影而被栅格化。</p>
-  <table id="data-table"><thead><tr><th>Region</th><th>Growth</th></tr></thead><tbody><tr><td>North America</td><td>38%</td></tr><tr><td>APAC</td><td>52%</td></tr><tr><td>Europe</td><td>31%</td></tr></tbody></table>
-  <div id="chart" data-pptx-chart-config='{"type":"column","data":[{"name":"Growth","labels":["NA","APAC","EU"],"values":[38,52,31]}],"showLegend":false,"showValue":true}'>
-    <div class="chart-bars"><div class="chart-bar" style="height:190px" data-value="38%" data-label="NA"></div><div class="chart-bar" style="height:260px" data-value="52%" data-label="APAC"></div><div class="chart-bar" style="height:155px" data-value="31%" data-label="EU"></div></div>
-  </div>
-  <div class="page" data-pptx-text-role="page-number">07 / 08</div>
-</section>
-
-<section class="pptx-slide" id="authorized-composite-slide">
-  <div class="kicker">08 · AUTHORIZED RASTER</div>
-  <h1 class="title" data-pptx-text-role="title">Only the visual composite becomes an image</h1>
-  <p class="body" data-pptx-text-role="body">复杂视觉节点可以显式转图，但语义文字必须留在节点外。</p>
-  <div id="authorized-composite" data-pptx-raster="allowed" data-pptx-raster-role="decorative-composite"></div>
-  <p id="authorized-copy" data-pptx-text-role="body">This copy remains native. The colorful composite is the only authorized raster on this slide.</p>
-  <div class="page" data-pptx-text-role="page-number">08 / 08</div>
-</section>
-
-</body>
+    <section class="pptx-slide" id="authorized-composite-slide">
+      <div class="kicker">08 · AUTHORIZED RASTER</div>
+      <h1 class="title" data-pptx-text-role="title">
+        Only the visual composite becomes an image
+      </h1>
+      <p class="body" data-pptx-text-role="body">
+        复杂视觉节点可以显式转图，但语义文字必须留在节点外。
+      </p>
+      <div
+        id="authorized-composite"
+        data-pptx-raster="allowed"
+        data-pptx-raster-role="decorative-composite"
+      ></div>
+      <p id="authorized-copy" data-pptx-text-role="body">
+        This copy remains native. The colorful composite is the only authorized
+        raster on this slide.
+      </p>
+      <div class="page" data-pptx-text-role="page-number">08 / 08</div>
+    </section>
+  </body>
 </html>

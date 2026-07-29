@@ -10,9 +10,11 @@ export interface MissingProtectedText {
 export function decodeXmlText(value: string): string {
   return value
     .replace(/&#x([\da-f]+);/giu, (_, hex: string) =>
-      String.fromCodePoint(Number.parseInt(hex, 16)))
+      String.fromCodePoint(Number.parseInt(hex, 16)),
+    )
     .replace(/&#(\d+);/gu, (_, decimal: string) =>
-      String.fromCodePoint(Number.parseInt(decimal, 10)))
+      String.fromCodePoint(Number.parseInt(decimal, 10)),
+    )
     .replaceAll("&amp;", "&")
     .replaceAll("&lt;", "<")
     .replaceAll("&gt;", ">")
@@ -20,17 +22,15 @@ export function decodeXmlText(value: string): string {
     .replaceAll("&apos;", "'");
 }
 
-export function extractTextNodes(
-  xml: string,
-  tag = "a:t",
-): string[] {
+export function extractTextNodes(xml: string, tag = "a:t"): string[] {
   const escapedTag = tag.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
   const expression = new RegExp(
     `<${escapedTag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${escapedTag}>`,
     "gu",
   );
-  return Array.from(xml.matchAll(expression))
-    .map((match) => decodeXmlText(match[1]));
+  return Array.from(xml.matchAll(expression)).map((match) =>
+    decodeXmlText(match[1]),
+  );
 }
 
 function normalize(value: string): string {

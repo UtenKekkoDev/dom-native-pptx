@@ -11,6 +11,48 @@ function readJson(relativePath: string): Record<string, unknown> {
   return JSON.parse(read(relativePath)) as Record<string, unknown>;
 }
 
+function npmPackFileList(): string[] {
+  const npmCli = process.env.npm_execpath;
+  expect(
+    npmCli,
+    "npm_execpath must be available through npm scripts",
+  ).toBeTruthy();
+  const result = spawnSync(
+    process.execPath,
+    [npmCli ?? "", "pack", "--dry-run", "--json", "--ignore-scripts"],
+    { cwd: path.resolve("."), encoding: "utf8" },
+  );
+  expect(result.status, result.stderr || result.stdout).toBe(0);
+  const report = JSON.parse(result.stdout) as Array<{
+    files: Array<{ path: string }>;
+  }>;
+  return (report[0]?.files ?? []).map((entry) =>
+    entry.path.replaceAll("\\", "/"),
+  );
+}
+
+interface MarkdownLink {
+  image: boolean;
+  target: string;
+}
+
+function markdownLinks(markdown: string): MarkdownLink[] {
+  return Array.from(
+    markdown.matchAll(/(!?)\[[^\]]*\]\(([^\s)]+)(?:\s+"[^"]*")?\)/gu),
+    (match) => ({ image: match[1] === "!", target: match[2] ?? "" }),
+  );
+}
+
+function localPackageTarget(target: string): string | undefined {
+  if (/^[a-z][a-z\d+.-]*:/iu.test(target) || target.startsWith("#")) {
+    return undefined;
+  }
+  return target
+    .split(/[?#]/u, 1)[0]
+    ?.replace(/^\.\//u, "")
+    .replace(/\\/gu, "/");
+}
+
 describe("npm package contract", () => {
   it("publishes the approved beta metadata and entry points", () => {
     const pkg = readJson("package.json") as {
@@ -50,19 +92,44 @@ describe("npm package contract", () => {
     );
     expect(pkg.engines?.node).toBe(">=22");
     expect(pkg.publishConfig).toEqual({ access: "public", provenance: true });
-    expect(pkg.files).toEqual(expect.arrayContaining([
+    expect(pkg.files).toEqual([
       "dist/**",
       "README.md",
       "LICENSE",
       "THIRD_PARTY_NOTICES.md",
-    ]));
-    expect(pkg.files).not.toEqual(expect.arrayContaining([
-      "src/**",
-      "tests/**",
-      "docs/**",
-      ".github/**",
-      "examples/**",
-    ]));
+      "ARCHITECTURE.md",
+      "RASTER_POLICY.md",
+      "SECURITY.md",
+      "SOURCE_MAP.md",
+      "SUPPORTED_CSS.md",
+    ]);
+  });
+
+  it("ships every relative README target and uses pinned public URLs for unpackaged images", () => {
+    const packageFiles = npmPackFileList();
+    const readme = read("README.md");
+    const links = markdownLinks(readme);
+    const relativeTargets = links
+      .map((link) => localPackageTarget(link.target))
+      .filter((target): target is string => Boolean(target));
+    const imageTargets = links
+      .filter((link) => link.image)
+      .map((link) => link.target);
+
+    expect(relativeTargets).toEqual(
+      expect.arrayContaining(["SECURITY.md", "SOURCE_MAP.md"]),
+    );
+    expect(packageFiles).toEqual(expect.arrayContaining(relativeTargets));
+    expect(imageTargets).toEqual([
+      "https://raw.githubusercontent.com/UtenKekkoDev/dom-native-pptx/v0.2.0-beta.1/docs/assets/demo-html.png",
+      "https://raw.githubusercontent.com/UtenKekkoDev/dom-native-pptx/v0.2.0-beta.1/docs/assets/demo-powerpoint.png",
+    ]);
+    expect(packageFiles.some((file) => file.startsWith("docs/assets/"))).toBe(
+      false,
+    );
+    expect(readme).toContain("### English Agent prompt");
+    expect(readme).toContain("### 中文 Agent 提示词");
+    expect(readme).not.toMatch(/C:\\Users\\/iu);
   });
 
   it("builds only production source into the package root", () => {
@@ -75,11 +142,9 @@ describe("npm package contract", () => {
     expect(config.compilerOptions?.rootDir).toBe("src");
     expect(config.compilerOptions?.outDir).toBe("dist");
     expect(config.include).toEqual(["src/**/*.ts"]);
-    expect(config.exclude).toEqual(expect.arrayContaining([
-      "tests",
-      "dist",
-      "node_modules",
-    ]));
+    expect(config.exclude).toEqual(
+      expect.arrayContaining(["tests", "dist", "node_modules"]),
+    );
   });
 
   it("ships license notices and removes machine-specific Skill paths", () => {

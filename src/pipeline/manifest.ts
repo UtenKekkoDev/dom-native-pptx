@@ -20,16 +20,18 @@ export class ConversionManifest {
 
   assertComplete(): void {
     for (const expected of this.expectedText.values()) {
-      const found = this.records.some((record) =>
-        record.slide === expected.slide &&
-        record.selector === expected.selector &&
-        record.pptxOutputType === "native-text" &&
-        record.text === expected.text &&
-        !record.rasterized);
+      const found = this.records.some(
+        (record) =>
+          record.slide === expected.slide &&
+          record.selector === expected.selector &&
+          record.pptxOutputType === "native-text" &&
+          record.text === expected.text &&
+          !record.rasterized,
+      );
       if (!found) {
         throw new Error(
           `Missing native text record: slide=${expected.slide}; ` +
-          `selector=${expected.selector}; text="${expected.text.slice(0, 120)}"`,
+            `selector=${expected.selector}; text="${expected.text.slice(0, 120)}"`,
         );
       }
     }

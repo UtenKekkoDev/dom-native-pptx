@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "path": "docs/assets/demo-html.png",
+      "type": "generated",
+      "sourceFixture": "examples/10-full-business-deck/slides.html",
+      "sourceSlide": 6,
+      "sourceSlideLabel": "05 · IP MONETIZATION",
+      "command": "npm run pptx:render-html -- examples/10-full-business-deck/slides.html .tmp/readme/html; Copy-Item -LiteralPath .tmp/readme/html/slide-006.png -Destination docs/assets/demo-html.png",
+      "renderer": "Chromium in safe mode",
+      "generatedAt": "2026-07-28",
+      "width": 1920,
+      "height": 1080,
+      "modifications": "Copied byte-for-byte without resizing, recompression, or AI modification.",
+      "license": "MIT",
+      "ownership": "Copyright (c) 2026 Yuxuan Sun",
+      "sha256": "4f455dbd424b238c11fbfd433683980fda544816c33f3b0876a1f8ed6eb1d964"
+    },
+    {
+      "path": "docs/assets/demo-powerpoint.png",
+      "type": "generated",
+      "sourceFixture": "examples/10-full-business-deck/slides.html",
+      "sourceSlide": 6,
+      "sourceSlideLabel": "05 · IP MONETIZATION",
+      "command": "npm run pptx:export -- examples/10-full-business-deck/slides.html .tmp/readme/demo.pptx; npm run pptx:render-powerpoint -- -Pptx .tmp/readme/demo.pptx -OutputDir .tmp/readme/powerpoint; Copy-Item -LiteralPath .tmp/readme/powerpoint/slide-006.png -Destination docs/assets/demo-powerpoint.png",
+      "renderer": "Microsoft PowerPoint Desktop",
+      "generatedAt": "2026-07-28",
+      "width": 1920,
+      "height": 1080,
+      "modifications": "Copied byte-for-byte without resizing, recompression, or AI modification.",
+      "license": "MIT",
+      "ownership": "Copyright (c) 2026 Yuxuan Sun",
+      "sha256": "aed7817f73fdc501eb8da8c3a04c1cfacb562a3d5ce9a8f8a2ef160e6ef410c5"
+    }
+  ]
+}

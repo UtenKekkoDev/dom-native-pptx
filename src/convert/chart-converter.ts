@@ -3,22 +3,26 @@ import type { DomNodeSnapshot } from "../types.js";
 import type { ConversionManifest } from "../pipeline/manifest.js";
 import { HTML_CANVAS, pxRectToInches } from "./unit-converter.js";
 
-const ChartSeriesSchema = z.object({
-  name: z.string().min(1),
-  labels: z.array(z.string()).min(1),
-  values: z.array(z.number()).min(1),
-}).superRefine((series, context) => {
-  if (series.labels.length !== series.values.length) {
-    context.addIssue({
-      code: "custom",
-      message: "A chart series must contain the same number of labels and values",
-    });
-  }
-});
+const ChartSeriesSchema = z
+  .object({
+    name: z.string().min(1),
+    labels: z.array(z.string()).min(1),
+    values: z.array(z.number()).min(1),
+  })
+  .superRefine((series, context) => {
+    if (series.labels.length !== series.values.length) {
+      context.addIssue({
+        code: "custom",
+        message:
+          "A chart series must contain the same number of labels and values",
+      });
+    }
+  });
 
 const ChartConfigSchema = z.object({
   type: z.enum(["bar", "column", "line", "pie", "doughnut"]),
-  data: z.array(ChartSeriesSchema)
+  data: z
+    .array(ChartSeriesSchema)
     .min(1, "At least one editable data series is required"),
   showLegend: z.boolean().optional(),
   showValue: z.boolean().optional(),
@@ -43,6 +47,7 @@ export function parseChartConfig(value: string): ChartConfig {
       `Invalid data-pptx-chart-config JSON: ${
         error instanceof Error ? error.message : String(error)
       }`,
+      { cause: error },
     );
   }
   return ChartConfigSchema.parse(parsed);
@@ -57,22 +62,25 @@ export function addNativeChart(
     node.attributes["data-pptx-chart-config"] ?? "",
   );
   const rect = pxRectToInches(node.rect, HTML_CANVAS);
-  const chartText = config.data.flatMap((series) => [
-    series.name,
-    ...series.labels,
-    ...series.values.map(String),
-  ]).join("\n");
+  const chartText = config.data
+    .flatMap((series) => [
+      series.name,
+      ...series.labels,
+      ...series.values.map(String),
+    ])
+    .join("\n");
   const chartData = config.data.map((series) => ({
     name: series.name,
     labels: [...series.labels],
     values: [...series.values],
   }));
   const pptxType = config.type === "column" ? "bar" : config.type;
-  const barDirection = config.type === "column"
-    ? { barDir: "col" }
-    : config.type === "bar"
-      ? { barDir: "bar" }
-      : {};
+  const barDirection =
+    config.type === "column"
+      ? { barDir: "col" }
+      : config.type === "bar"
+        ? { barDir: "bar" }
+        : {};
   slide.addChart(pptxType, chartData, {
     x: rect.x,
     y: rect.y,

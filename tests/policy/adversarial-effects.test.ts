@@ -12,7 +12,7 @@ const SLIDES = [
   "negative-z-index",
 ] as const;
 
-async function preflightDeck(slideId: typeof SLIDES[number]): Promise<void> {
+async function preflightDeck(slideId: (typeof SLIDES)[number]): Promise<void> {
   const slides = await snapshotDeck(
     path.resolve("tests/fixtures/adversarial-effects.html"),
   );

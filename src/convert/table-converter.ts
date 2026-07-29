@@ -21,9 +21,11 @@ export function extractTableRows(node: DomNodeSnapshot): string[][] {
   const rowNodes: DomNodeSnapshot[] = [];
   collectRows(node, rowNodes);
   return rowNodes
-    .map((row) => row.children
-      .filter((cell) => cell.tagName === "TH" || cell.tagName === "TD")
-      .map((cell) => cell.text.trim()))
+    .map((row) =>
+      row.children
+        .filter((cell) => cell.tagName === "TH" || cell.tagName === "TD")
+        .map((cell) => cell.text.trim()),
+    )
     .filter((row) => row.length > 0);
 }
 
@@ -38,7 +40,9 @@ export function addNativeTable(
   }
   const columnCount = rows[0].length;
   if (rows.some((row) => row.length !== columnCount)) {
-    throw new Error(`Native table rows must have equal column counts: ${node.selector}`);
+    throw new Error(
+      `Native table rows must have equal column counts: ${node.selector}`,
+    );
   }
 
   const rect = pxRectToInches(node.rect, HTML_CANVAS);

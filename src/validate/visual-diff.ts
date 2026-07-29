@@ -17,13 +17,10 @@ export async function compareImages(
 ): Promise<VisualDiffResult> {
   const expected = PNG.sync.read(await fs.readFile(expectedPath));
   const actual = PNG.sync.read(await fs.readFile(actualPath));
-  if (
-    expected.width !== actual.width ||
-    expected.height !== actual.height
-  ) {
+  if (expected.width !== actual.width || expected.height !== actual.height) {
     throw new Error(
       `Image dimensions differ: expected ${expected.width}x${expected.height}, ` +
-      `actual ${actual.width}x${actual.height}`,
+        `actual ${actual.width}x${actual.height}`,
     );
   }
 

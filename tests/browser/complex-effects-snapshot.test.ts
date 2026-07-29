@@ -1,6 +1,7 @@
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { snapshotDeck } from "../../src/browser/dom-snapshot.js";
+import { openSlidePage } from "../../src/browser/slide-page-session.js";
 import type { DomNodeSnapshot } from "../../src/types.js";
 
 function flatten(nodes: DomNodeSnapshot[]): DomNodeSnapshot[] {
@@ -27,4 +28,32 @@ describe("complex effect DOM evidence", () => {
     expect(caption?.style.zIndex).toBe("20");
     expect(composite?.style.mixBlendMode).toBe("normal");
   });
+
+  it("keeps the native-data title inside its box and clear of the body", async () => {
+    const session = await openSlidePage({
+      inputPath: path.resolve("tests/fixtures/complex-effects-stress.html"),
+    });
+    try {
+      const title = session.page.locator("#table-chart-effects .title");
+      const body = session.page.locator("#table-chart-effects .body");
+      const layout = await title.evaluate(
+        (element, bodyElement) => {
+          const titleBox = element.getBoundingClientRect();
+          const bodyBox = (bodyElement as HTMLElement).getBoundingClientRect();
+          return {
+            bottom: titleBox.bottom,
+            bodyTop: bodyBox.top,
+            clientHeight: element.clientHeight,
+            scrollHeight: element.scrollHeight,
+          };
+        },
+        await body.elementHandle(),
+      );
+
+      expect(layout.scrollHeight).toBeLessThanOrEqual(layout.clientHeight);
+      expect(layout.bottom).toBeLessThanOrEqual(layout.bodyTop);
+    } finally {
+      await session.close();
+    }
+  }, 30_000);
 });

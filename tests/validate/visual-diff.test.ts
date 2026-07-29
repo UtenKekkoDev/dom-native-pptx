@@ -17,7 +17,9 @@ describe("visual validation", () => {
         channels: 4,
         background: { r: 80, g: 42, b: 120, alpha: 1 },
       },
-    }).png().toFile(fixture);
+    })
+      .png()
+      .toFile(fixture);
 
     const result = await compareImages(fixture, fixture, diff);
 
@@ -37,9 +39,22 @@ describe("visual validation", () => {
       outputDir,
     );
 
-    expect(result.files).toEqual([
-      path.join(outputDir, "slide-001.png"),
-    ]);
+    expect(result.files).toEqual([path.join(outputDir, "slide-001.png")]);
+    expect(await sharp(result.files[0]).metadata()).toMatchObject({
+      width: 1920,
+      height: 1080,
+    });
+  });
+
+  it("renders the deprecated string selector argument", async () => {
+    const outputDir = path.resolve(".tmp/tests/html-render-legacy-selector");
+    const result = await renderHtmlSlides(
+      path.resolve("tests/fixtures/legacy-custom-selector.html"),
+      outputDir,
+      ".legacy-slide",
+    );
+
+    expect(result.files).toEqual([path.join(outputDir, "slide-001.png")]);
     expect(await sharp(result.files[0]).metadata()).toMatchObject({
       width: 1920,
       height: 1080,
