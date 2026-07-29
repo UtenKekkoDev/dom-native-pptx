@@ -799,7 +799,12 @@ describe("committed public tree synchronization", () => {
           }
         },
       }),
-    ).rejects.toMatchObject({ code: "UNSAFE_DESTINATION_ENTRY" });
+    ).rejects.toMatchObject({
+      code:
+        process.platform === "win32"
+          ? "UNSAFE_DESTINATION_ENTRY"
+          : "DESTINATION_CHANGED",
+    });
     expect(await read(outside, "index.ts")).toBe("old source\n");
   });
 
