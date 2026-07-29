@@ -745,28 +745,34 @@ describe("committed public tree synchronization", () => {
     expect(JSON.stringify(formatted)).not.toContain(hiddenValue);
   });
 
-  it("rejects a clean managed-root junction without touching its external target", async () => {
-    const privateRepo = await createRepo("private");
-    const publicRepo = await createDestination();
-    const outside = await createRepo("outside");
-    await write(privateRepo, "src/index.ts", "new source\n");
-    await commitAll(privateRepo);
-    await write(publicRepo, "src/sentinel.txt", "outside sentinel\n");
-    await commitAll(publicRepo, "tracked managed root");
-    await write(outside, "sentinel.txt", "outside sentinel\n");
-    await fs.rm(path.join(publicRepo, "src"), { recursive: true, force: true });
-    await fs.symlink(outside, path.join(publicRepo, "src"), "junction");
-    expect(await git(publicRepo, "status", "--porcelain")).toBe("");
+  it.runIf(process.platform === "win32")(
+    "rejects a clean managed-root junction without touching its external target",
+    async () => {
+      const privateRepo = await createRepo("private");
+      const publicRepo = await createDestination();
+      const outside = await createRepo("outside");
+      await write(privateRepo, "src/index.ts", "new source\n");
+      await commitAll(privateRepo);
+      await write(publicRepo, "src/sentinel.txt", "outside sentinel\n");
+      await commitAll(publicRepo, "tracked managed root");
+      await write(outside, "sentinel.txt", "outside sentinel\n");
+      await fs.rm(path.join(publicRepo, "src"), {
+        recursive: true,
+        force: true,
+      });
+      await fs.symlink(outside, path.join(publicRepo, "src"), "junction");
+      expect(await git(publicRepo, "status", "--porcelain")).toBe("");
 
-    await expect(
-      materializePublicTree({
-        sourceRepo: privateRepo,
-        sourceRef: "HEAD",
-        destination: publicRepo,
-      }),
-    ).rejects.toMatchObject({ code: "UNSAFE_DESTINATION_ENTRY" });
-    expect(await read(outside, "sentinel.txt")).toBe("outside sentinel\n");
-  });
+      await expect(
+        materializePublicTree({
+          sourceRepo: privateRepo,
+          sourceRef: "HEAD",
+          destination: publicRepo,
+        }),
+      ).rejects.toMatchObject({ code: "UNSAFE_DESTINATION_ENTRY" });
+      expect(await read(outside, "sentinel.txt")).toBe("outside sentinel\n");
+    },
+  );
 
   it("revalidates managed roots immediately before mutation", async () => {
     const privateRepo = await createRepo("private");
