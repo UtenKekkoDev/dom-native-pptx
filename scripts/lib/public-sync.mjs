@@ -880,6 +880,7 @@ async function runGit(repo, args, options = {}) {
   try {
     const result = await execFile("git", ["-C", repo, ...args], {
       encoding: options.encoding ?? "buffer",
+      env: options.env ? { ...process.env, ...options.env } : process.env,
       maxBuffer: MAX_BUFFER,
       windowsHide: true,
     });
@@ -1433,12 +1434,11 @@ async function resolveDestinationIdentity(destination) {
 }
 
 async function destinationStatus(destination) {
-  return runGit(destination, [
-    "status",
-    "--porcelain",
-    "-z",
-    "--untracked-files=all",
-  ]);
+  return runGit(
+    destination,
+    ["status", "--porcelain", "-z", "--untracked-files=all"],
+    { env: { GIT_OPTIONAL_LOCKS: "0" } },
+  );
 }
 
 async function destinationIndexPath(destination) {
